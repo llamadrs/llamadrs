@@ -5,16 +5,16 @@ import json
 from tqdm import tqdm
 import argparse
 
-def diarize_text(pipeline, context, text, model_id):
-    input_text = f"""Task: Given an undiarized verbatim transcription of utterances from a psychiatric session, diarize the specified utterance into one of two speaker roles: Professional (MD/RA) or Patient. If the speaker's role is unclear, output 'Unclear'.
+def diarize_text(pipeline, vtt_transcription, model_id):
+    input_text = f"""Task: Diarize all timed utterances from a VTT (Video Text Track) transcription of a psychiatric session. Each utterance should be assigned to one of two speaker roles: Practitioner (MD/RA) or Patient. If the speaker's role is unclear, output 'Unclear'. The output must retain the exact same format as the input VTT file.
 
 Guidelines:
-1. Professional (MD/RA) typically:
+1. Practitioner (MD/RA) typically:
    - Asks questions or seeks clarification
-   - Provides explanations or professional opinions
+   - Provides explanations or Practitioner opinions
    - May use clinical terminology
    - Guides the conversation or redirects it when necessary
-   - Maintains a more neutral, professional tone
+   - Maintains a more neutral, Practitioner tone
 
 2. Patient typically:
    - Answers questions or describes personal experiences
@@ -24,22 +24,35 @@ Guidelines:
    - Shows a range of emotions in their speech
 
 3. Context Interpretation:
-   - The context includes utterances that immediately precede and follow the text to diarize
-   - Both the context and the text to diarize are undiarized transcriptions
-   - Analyze the content and style of each utterance to determine the likely speaker
-   - Consider the overall flow of conversation to identify potential speaker changes
-   - Pay attention to question-answer patterns, topic introductions, and shifts in conversation focus
-   - In some cases, the transcript only contains one speaker's utterances. In such cases, do not hesitate to assign the same speaker role to all utterances
+   - Consider each utterance within the full context of the transcription
+   - Analyze content and style to determine the likely speaker
+   - Pay attention to conversational patterns, topic shifts, and emotional tones
+   - Consider the overall conversation flow to identify speaker roles
 
-Output only the role of the speaker (Professional, Patient, or Unclear) without explanation. If there is any ambiguity in the speaker role, output 'Unclear'.
+Format:
+- The output should match the exact VTT format of the input, including timestamps and text.
+- Prepend the corresponding speaker role (Practitioner, Patient, or Unclear) to each utterance while preserving the VTT structure.
+- If there is any ambiguity, prepend 'Unclear' to the utterance.
 
-Now, diarize the following utterance based on the given undiarized context:
+Now, diarize the following VTT transcription and only output the diarized text:
+Example:
+Input:
+...
+03:13.098 --> 03:16.600
+So a couple things before we get started.
+...
+Output:
+...
+03:13.098 --> 03:16.600
+Practitioner: So a couple things before we get started.
+...
 
-Context:
-{context}
+Your turn:
+Input:
+{vtt_transcription}
 
-Text: {text}
 Output: """
+
     if "Llama" in model_id:
         messages = [
             {"role": "system", "content": "You are a diarization model for psychiatric sessions."},
@@ -50,14 +63,22 @@ Output: """
             pipeline.tokenizer.eos_token_id,
             pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")
         ]
-
+        
+        input_token_lengths = len(pipeline.tokenizer(vtt_transcription)["input_ids"])
+        # count number of --> in the vtt_transcription
+        num_timestamps = vtt_transcription.count("-->")
+        
+        max_label_token_lengths = max(len(pipeline.tokenizer("Practitioner: ")["input_ids"]), len(pipeline.tokenizer("Patient: ")["input_ids"]), len(pipeline.tokenizer("Unclear: ")["input_ids"]))
+        labels_token_lengths = max_label_token_lengths * num_timestamps
+        
+        output_length = input_token_lengths + labels_token_lengths
         outputs = pipeline(
             messages,
-            max_new_tokens=5,
+            max_new_tokens= output_length,
             eos_token_id=terminators,
             do_sample=True,
             temperature=0.6,
-            top_p=0.9,
+            top_p=0.9
         )
     else:
         messages = [
@@ -66,84 +87,56 @@ Output: """
 
         outputs = pipeline(
             messages,
-            max_new_tokens=5,
+            max_new_tokens=output_length,
             do_sample=True,
             temperature=0.6,
             top_p=0.9)
         
-    return outputs[0]["generated_text"][-1]["content"].strip().replace("\n", " ").lower()
+    return outputs[0]["generated_text"][-1]["content"].strip()
 
 def process_directory(directory, pipeline, chunk_no, chunk_idx, model_id):
     directories = os.listdir(directory)
-    directories = [patient_dir for patient_dir in directories if  os.path.isdir(os.path.join(directory, patient_dir))
-                   and not all([os.path.exists(os.path.join(directory, patient_dir, session, f"transcription_{model_id}.json")) for session in os.listdir(os.path.join(directory, patient_dir))
-                                if os.path.isdir(os.path.join(directory, patient_dir, session))])]
+    directories = [patient_dir for patient_dir in directories if os.path.isdir(os.path.join(directory, patient_dir)) 
+                and any(os.path.exists(os.path.join(directory, patient_dir, session, file)) 
+                        and file.endswith("_raw.vtt") 
+                        and not os.path.exists(os.path.join(directory, patient_dir, session, file.replace("_raw.vtt", "_llm_diarized.vtt"))) 
+                        for session in os.listdir(os.path.join(directory, patient_dir)) 
+                        if os.path.isdir(os.path.join(directory, patient_dir, session)) 
+                        for file in os.listdir(os.path.join(directory, patient_dir, session)))]
     directories = sorted(directories)
     chunk_size = len(directories) // chunk_no
     start_idx = chunk_idx * chunk_size
     end_idx = start_idx + chunk_size if chunk_idx < chunk_no - 1 else len(directories)
-    
+    print(f"Processing {directory} from {start_idx} to {end_idx}")
     for dir in tqdm(directories[start_idx:end_idx]):
         dir_path = os.path.join(directory, dir)
         if not os.path.isdir(dir_path):
             continue
-        for session in os.listdir(dir_path):
+        for session in tqdm([session for session in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, session))]):
             session_path = os.path.join(dir_path, session)
-            if not os.path.isdir(session_path) or os.path.exists(os.path.join(session_path, f"transcription_{model_id}.json")):
+            raw_vtt_files = [os.path.join(session_path, file) for file in os.listdir(session_path) if file.endswith("_raw.vtt")]
+            if len(raw_vtt_files) == 0:
                 continue
-            process_session(session_path, pipeline, model_id)
+            raw_vtt_file = raw_vtt_files[0]
+            process_session(raw_vtt_file, pipeline, model_id)
 
-def process_session(session_path, pipeline, model_id):
-    transcript_files = [os.path.join(session_path, file) for file in os.listdir(session_path) 
-                        if file.startswith("audio_track") and "reduced" in file and file.endswith(".txt")]
-    transcript_dict = {}
-    
-    for file in transcript_files:
-        with open(file, "r") as f:
-            transcript = f.readlines()
-        
-        last_line = ""
-        for line_no, line in enumerate(transcript):
-            line = line.strip()
-            time_stamp, text = line.split(": ")
-            if text == last_line:
-                continue
-            start_time, end_time = time_stamp.split("-")
-            start_time, end_time = float(start_time), float(end_time)
-            
-            if f"{start_time}-{end_time}" not in transcript_dict:
-                transcript_dict[f"{start_time}-{end_time}"] = []
-            
-            context = get_context(transcript, line_no)
-            speaker_role = diarize_text(pipeline, context, text, model_id)
-            
-            formatted_text = f"{os.path.basename(file).replace('_reduced_vad.txt', '').replace('_louder', '')}, {speaker_role}: {text}"
-            if formatted_text not in transcript_dict[f"{start_time}-{end_time}"]:
-                transcript_dict[f"{start_time}-{end_time}"].append(formatted_text)
-            
-            last_line = text
-    
-    # save json
-    with open(os.path.join(session_path, f"transcription_{model_id}.json"), "w") as f:
-        json.dump(transcript_dict, f)
+def process_session(raw_vtt_file, pipeline, model_id):
+    llm_diarized_file = raw_vtt_file.replace("_raw.vtt", "_llm_diarized.vtt")
+    if os.path.exists(llm_diarized_file):
+        return
+    with open(raw_vtt_file, 'r') as file:
+        vtt_transcription = file.read()
+    vtt_diarized = diarize_text(pipeline, vtt_transcription, model_id)
+    with open(llm_diarized_file, 'w') as file:
+        file.write(vtt_diarized)
 
-def get_context(transcript, line_no):
-    context = []
-    context_line_no = max(0, line_no - 5)
-    last_context_line = ""
-    while len(context) < 11 and context_line_no < len(transcript):
-        current_line = transcript[context_line_no].strip()
-        if current_line.split(": ")[1] != last_context_line:
-            context.append(current_line)
-            last_context_line = current_line.split(": ")[1]
-        context_line_no += 1
-    return "\n".join(context)
 
 def main():
     parser = argparse.ArgumentParser(description="Process directories for diarization")
-    parser.add_argument("--chunk_no", type=int, required=True, help="Total number of chunks")
-    parser.add_argument("--chunk_idx", type=int, required=True, help="Index of the current chunk")
-    parser.add_argument("--model_id", type=str, default="Qwen/Qwen2.5-72B-Instruct-GPTQ-Int4", help="Model ID to use for diarization")
+    parser.add_argument("--chunk_no", type=int, help="Total number of chunks", default=1)
+    parser.add_argument("--chunk_idx", type=int, help="Index of the current chunk", default=0)
+    parser.add_argument("--model_id", type=str, default= "Qwen/Qwen2.5-72B-Instruct-GPTQ-Int4", help="Model ID to use for diarization")
+    parser.add_argument("--directory", type=str, help="Directory containing CAMI data", required=True)
     args = parser.parse_args()
 
     model_id = args.model_id
@@ -153,8 +146,7 @@ def main():
     from transformers.utils import logging
     logging.set_verbosity_error()
 
-    directory = '/home/gyk/CAMI/'
-    process_directory(directory, pipeline, args.chunk_no, args.chunk_idx, args.model_id.split("/")[-1].replace("-", "_"))
+    process_directory(args.directory, pipeline, args.chunk_no, args.chunk_idx, args.model_id.split("/")[-1].replace("-", "_"))
 
 if __name__ == "__main__":
     main()
