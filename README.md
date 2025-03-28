@@ -23,7 +23,7 @@ The repository contains the following key scripts:
 
 5. `madrs_predict_segmented.py`: Similar to `madrs_predict_holistic.py`, but it operates on segmented utterances. It uses the output from the segmentation module to score the relevant segment of the conversation for each MADRS item.
 
-6. `eva
+6. `evaluatio
 
 These scripts form the core components of the LlaMADRS pipeline, handling preprocessing, assessment, and segmentation tasks as described in the paper.
 

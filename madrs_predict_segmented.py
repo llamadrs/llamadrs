@@ -1,4 +1,3 @@
-# madrs_predict.py is a script that uses LLM to predict the MADRS score for each MADRS item.
 import torch
 import os
 import json
@@ -8,6 +7,8 @@ from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
 from typing import List, Dict, Any
 import pandas as pd
+from vllm.lora.request import LoRARequest
+
 
 madrs_dict = {
     0: "madrs_totalscore",
@@ -38,8 +39,12 @@ def requests(data: List[Dict[str, Any]], output_length, prompt_length, model_id,
     """
     if "gemma" in model_id:
         llm = LLM(model=model_id, tensor_parallel_size=tp_size, max_model_len=prompt_length+100, gpu_memory_utilization=1.0)
+    elif "MentaLLaMA-33B-lora" in model_id:
+        og_model_id = "lmsys/vicuna-33b-v1.3"
+        max_model_len = min(prompt_length+100, 2048)
+        llm = LLM(model=og_model_id, tensor_parallel_size=tp_size, max_model_len=prompt_length+100, enable_lora=True, max_lora_rank=32)
     else:
-        llm = LLM(model=model_id, tensor_parallel_size=tp_size, max_model_len=prompt_length+100)
+        llm = LLM(model=model_id, tensor_parallel_size=tp_size, max_model_len=prompt_length+100, gpu_memory_utilization=0.95)
     sampling_params = SamplingParams(temperature=0.6, top_p=0.9, max_tokens=500, seed=n)
 
     full_prompts = [element["messages"] for element in data]
@@ -51,17 +56,21 @@ def requests(data: List[Dict[str, Any]], output_length, prompt_length, model_id,
     for i in tqdm(range(0, len(full_prompts), batch_size), total=len(full_prompts)//batch_size):
         batch_prompts = full_prompts[i:i+batch_size]
         batch_output_files = output_files[i:i+batch_size]
-        outputs = llm.generate(batch_prompts, sampling_params)
+        if "MentaLLaMA-33B-lora" in model_id:
+            sql_lora_path = "~/.cache/huggingface/hub/MentaLLaMA-33B-lora"
+            outputs = llm.generate(batch_prompts, sampling_params, lora_request=LoRARequest(model_id, 1, sql_lora_path))
+        else:
+            outputs = llm.generate(batch_prompts, sampling_params)
 
         for output, output_file, label in zip(outputs, batch_output_files, labels):
             generated_text = output.outputs[0].text  # Assuming only one output is generated per prompt
-            with open(output_file, 'w') as file:
+            with open(output_file, 'w', encoding='utf-8') as file:
                 file.write(generated_text)
                 file.write(f"\nGround Truth: {label}")
                 
 
 
-def diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id, madrs_idx, n, tp_size=1, prompt_type=""):
+def diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id, madrs_no, n, tp_size=1, prompt_type=""):
     data = []
     max_length = 0
     max_prompt_length = 0
@@ -69,10 +78,10 @@ def diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id,
         prompt_dir = "full"
     else:
         prompt_dir = f"{prompt_type}"
-    prompt_file = f"./prompts/{prompt_dir}/madrs_item_{madrs_idx}.txt"
+    prompt_file = f"./prompts/{prompt_dir}/madrs_item_{madrs_no}.txt"
     with open(prompt_file, 'r') as file:
         prompt = file.read()
-    no_test_sessions_file = f"./prompts/{prompt_dir}/madrs_item_{madrs_idx}_no_test_sessions.txt"
+    no_test_sessions_file = f"./prompts/{prompt_dir}/madrs_item_{madrs_no}_no_test_sessions.txt"
     with open(no_test_sessions_file, 'r') as file:
         no_test_sessions = file.read().split("\n")
         no_test_sessions = [session.split("/")[-1] for session in no_test_sessions]
@@ -95,8 +104,13 @@ Rating:"""
         else:
             messages = [
                 {"role": "user", "content": input_text}]
-            
-        prompts = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
+        if model_id in ["klyang/MentaLLaMA-33B-lora"]:
+            chat_template = open('./chat_templates/vicuna.jinja').read()
+            chat_template = chat_template.replace('    ', '').replace('\n', '')
+            tokenizer.chat_template = chat_template
+            prompts = limit_prompt_tokens(input_text, tokenizer, 2048 - 200)
+        else:
+            prompts = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
         prompt_length = len(tokenizer(prompts)["input_ids"])
         if prompt_length > max_prompt_length:
             max_prompt_length = prompt_length
@@ -119,8 +133,46 @@ Rating:"""
     prompt_length = max_prompt_length
     
     requests(data, output_length, prompt_length, model_id, n, tp_size=tp_size)
+def limit_prompt_tokens(input_text, tokenizer, max_prompt_length):
+    """
+    Limit the prompt tokens to a maximum length while preserving the most recent content.
+    
+    Args:
+        input_text (str): The input text to be tokenized
+        tokenizer: The tokenizer object
+        max_prompt_length (int): Maximum allowed prompt length in tokens
+    
+    Returns:
+        str: Truncated text that fits within max_prompt_length when tokenized
+    """
+    messages = [{"role": "user", "content": input_text}]
 
-def process_directory(directory, tokenizer, chunk_no, chunk_idx, model_id, suffix, madrs_idx=2, run_idx=0, tp_size=1, prompt_type=""):
+    # Apply chat template
+    prompts = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
+    prompt_length = len(tokenizer(prompts)["input_ids"])
+    
+    # If prompt is already within limits, return as is
+    if prompt_length <= max_prompt_length:
+        return prompts
+    
+    # Tokenize the full input text to get token IDs
+    input_tokens = tokenizer(input_text)["input_ids"]
+    
+    # Calculate how many tokens we need to remove
+    tokens_to_keep = max_prompt_length - (prompt_length - len(input_tokens))
+    
+    # Keep the last 'tokens_to_keep' tokens
+    truncated_tokens = input_tokens[-tokens_to_keep:]
+    
+    # Decode the truncated tokens back to text
+    truncated_text = tokenizer.decode(truncated_tokens)
+    
+    # Reapply the chat template
+    messages = [{"role": "user", "content": truncated_text}]
+    prompts = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
+    
+    return prompts
+def process_directory(directory, tokenizer, chunk_no, chunk_idx, model_id, suffix, madrs_no=2, run_no=0, tp_size=1, prompt_type=""):
     directories = os.listdir(directory)
     directory_df  = pd.read_csv(f"{directory}/full_dataset_processed.csv")
     
@@ -129,8 +181,8 @@ def process_directory(directory, tokenizer, chunk_no, chunk_idx, model_id, suffi
     vtt_transcriptions = []
     output_files = []
     labels = []
-    n = run_idx
-    madrs_label = madrs_dict[madrs_idx]
+    n = run_no
+    madrs_label = madrs_dict[madrs_no]
     for dir in tqdm(directories):
         dir_path = os.path.join(directory, dir)
         if not os.path.isdir(dir_path):
@@ -147,35 +199,25 @@ def process_directory(directory, tokenizer, chunk_no, chunk_idx, model_id, suffi
             except:
                 continue
             
-            cleaned_transcripts = [os.path.join(session_path, file) for file in os.listdir(session_path) if file.endswith(f"llmQw2.5_72b4q_diarized_cleaned.vtt")]
+            cleaned_transcript = os.path.join(session_path, "madrs_transcriptions", f"{madrs_dict[madrs_no]}_diarized_cleaned.txt")
             
-            if len(cleaned_transcripts) == 0:
+            if not os.path.exists(cleaned_transcript):
                 continue
-            cleaned_transcript = cleaned_transcripts[0]
-            vtt_transcription = process_session(cleaned_transcript, tokenizer, model_id, suffix, madrs_idx)
+            
+            vtt_transcription = process_session(cleaned_transcript, tokenizer, model_id, suffix, madrs_no)
             if vtt_transcription is None or vtt_transcription.strip() == "":
                 continue
             if prompt_type != "":
-                output_dir = os.path.join(session_path, f"focused_predictions_qwen_diarized_{suffix}_{prompt_type}")
+                output_dir = os.path.join(session_path, "llamadrs_predictions", f"segmented_{suffix}_{prompt_type}")
             else:
-                output_dir = os.path.join(session_path, f"focused_predictions_qwen_diarized_{suffix}")
+                output_dir = os.path.join(session_path, "llamadrs_predictions",  f"segmented_{suffix}")
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            output_file = os.path.join(output_dir, f"madrs{madrs_idx}_output_{n}.txt")
-            cont_flag = False
+            output_file = os.path.join(output_dir, f"madrs{madrs_no}_output_{n}.txt")
             if os.path.exists(output_file):
-                with open(output_file, 'r') as file:
-                    output_text = file.read()
-                rating = output_text.split("rating:")[-1].split("\n")[0].strip()
-                           #get only the number from the string
-                rating = ''.join(filter(str.isdigit, rating))
-                try:
-                    rating = int(rating)
-                    cont_flag = True
-                except:
-                    cont_flag = False
-            if cont_flag:
-                continue
+                #continue
+                pass
+
             vtt_transcriptions.append(vtt_transcription)
             output_files.append(output_file)
             labels.append(label)
@@ -190,9 +232,9 @@ def process_directory(directory, tokenizer, chunk_no, chunk_idx, model_id, suffi
     
     if len(vtt_transcriptions) == 0:
         return
-    diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id, madrs_idx, n, tp_size=tp_size, prompt_type=prompt_type)
+    diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id, madrs_no, n, tp_size=tp_size, prompt_type=prompt_type)
 
-def process_session(raw_vtt_file, tokenizer, model_id, suffix, madrs_idx):
+def process_session(raw_vtt_file, tokenizer, model_id, suffix, madrs_no):
     with open(raw_vtt_file, 'r') as file:
         vtt_transcription = file.read()
     
@@ -203,13 +245,13 @@ def main():
     parser = argparse.ArgumentParser(description="Process directories for diarization")
     parser.add_argument("--chunk_no", type=int, help="Total number of chunks", default=1)
     parser.add_argument("--chunk_idx", type=int, help="Index of the current chunk", default=0)
-    parser.add_argument("--madrs_idx", type=int, help="MADRS item number", default=0)
-    parser.add_argument("--model_id", type=str, default= "Qwen/Qwen2.5-72B-Instruct-GPTQ-Int4", help="Model ID to use for diarization")
-    parser.add_argument("--run_idx", type=int, default=0, help="Run number. Used for multi-run evaluation. Default is 0. Should be less than 5.")
-    parser.add_argument("--tp_size", type=int, default=1, help="Number of GPUs for tensor parallelism. Default is 1. If using multiple GPUs, set this to the number of GPUs.")
-    parser.add_argument("--prompt_type", type=str, default="", help="Type of prompt to use. Default is empty string for normal focus. Used for ablation studies. Options: 'normal', 'normal_focus', 'normal_focus_2', etc. Default is empty string for normal focus.")
-    parser.add_argument("--directory", type=str, help="Directory containing CAMI data", required=True)
+    parser.add_argument("--madrs_no", type=int, help="MADRS item number", default=1)
+    parser.add_argument("--model_id", type=str, default= "Qwen/Qwen2.5-7B-Instruct", help="Model ID to use for diarization")
+    parser.add_argument("--run_no", type=int, default=0, help="Run number")
+    parser.add_argument("--tp_size", type=int, default=1, help="Tensor parallel size")
+    parser.add_argument("--prompt_type", type=str, default="", help="Type of prompt to use. Default is empty string for full prompt. Can be used to specify different prompt types for different runs.")
     args = parser.parse_args()
+    parser.add_argument("--directory", type=str, help="Directory containing CAMI data", required=True)
 
     model_id = args.model_id
     model_dict = {"neuralmagic/Meta-Llama-3.1-70B-Instruct-quantized.w4a16": "70b4q",
@@ -224,21 +266,23 @@ def main():
                   "neuralmagic/Mixtral-8x22B-Instruct-v0.1-FP8": "Mix8x22b4q",
                   "google/gemma-2-27b-it": "Gen2_27b4q",
                   "ModelCloud/Mistral-Large-Instruct-2407-gptq-4bit": "Mistral_2407_4Q",
-                  "klyang/MentaLLaMA-33B-lora": "MentaLLaMA_33B_lora"
+                  "klyang/MentaLLaMA-33B-lora": "MentaLLaMA_33B_lora",
+                  "Qwen/Qwen2.5-7B-Instruct": "Qw2.5_7b_fp32",
+                  "Qwen/Qwen2.5-14B-Instruct": "Qw2.5_14b_fp32",
+                    "Qwen/Qwen2.5-32B-Instruct": "Qw2.5_32b_fp32"
                 }
     
     
-    if args.run_idx>5:
+    if args.run_no>5:
         print("Run number should be less than 5")
         return
-    
     print(f"Processing model {model_id}")
     tokenizer = AutoTokenizer.from_pretrained(model_id)
 
     from transformers.utils import logging
     logging.set_verbosity_error()
 
-    process_directory(args.directory, tokenizer, args.chunk_no, args.chunk_idx, model_id, model_dict[model_id], madrs_idx=args.madrs_idx, run_idx=args.run_idx, tp_size=args.tp_size, prompt_type=args.prompt_type)
+    process_directory(args.directory, tokenizer, args.chunk_no, args.chunk_idx, model_id, model_dict[model_id], madrs_no=args.madrs_no, run_no=args.run_no, tp_size=args.tp_size, prompt_type=args.prompt_type)
 
 if __name__ == "__main__":
     main()
