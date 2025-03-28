@@ -32,11 +32,9 @@ The `prompts` directory contains various prompt files used for MADRS assessment 
 
 1. `full`: Contains the complete set of prompts for each MADRS item, including descriptions, demonstrations, and guidelines for assessment.
 
-2. `no_dem`: Prompts in this directory exclude the demonstrative examples or illustrations.
+2. `no_dem`: Prompts in this directory exclude the demonstrative examples.
 
 3. `no_desc`: This directory contains prompts without the descriptive content or explanations.
-
-4. `no_disc`: Prompts in this directory exclude any discursive or additional contextual information.
 
 5. `raw`: This directory contains the initial or unprocessed versions of the prompts.
 
