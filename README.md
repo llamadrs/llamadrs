@@ -23,9 +23,9 @@ The repository contains the following key scripts:
 
 5. `madrs_predict_segmented.py`: Similar to `madrs_predict_holistic.py`, but it operates on segmented utterances. It uses the output from the segmentation module to score the relevant segment of the conversation for each MADRS item.
 
-6. `evaluatio
+6. `evaluation.py`: This script evaluates the performance of the LlaMADRS system against the expert ratings from the CAMI dataset. It calculates metrics such as mean absolute error (MAE), R-squared (R²), and ICC (Intraclass Correlation Coefficient) to assess the accuracy and reliability of the LlaMADRS scores compared to the expert ratings.
 
-These scripts form the core components of the LlaMADRS pipeline, handling preprocessing, assessment, and segmentation tasks as described in the paper.
+These scripts form the core components of the LlaMADRS pipeline, handling preprocessing, segmentation, assessment and evaluation tasks as described in the paper.
 
 ## Prompts
 The `prompts` directory contains various prompt files used for MADRS assessment and segmentation. The directory is organized into several subdirectories, each representing a specific prompting strategy or variant:
