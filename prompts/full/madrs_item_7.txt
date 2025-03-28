@@ -1,0 +1,190 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Lassitude
+
+Description:
+Representing a difficulty getting started, or slowness initiating and performing everyday activities.
+
+Questions:
+Have you had any trouble getting started at things in the past week?
+What things?
+Have you had to push yourself to do things?
+What things?
+How hard have you had to push yourself?
+Are you OK once you get started or is it still more of an effort to get something done?
+What about getting started at simple routine everyday things (like getting dressed)?
+Have you done everyday things more slowly than usual?
+Have you been sluggish?
+Like what, for example?
+How bad has that been?
+
+Rating Scale:
+0 - Hardly any difficulty in getting started. No sluggishness.
+1 - Between 0 and 2.
+2 - Difficulties in starting activities.
+3 - Between 2 and 4.
+4 - Difficulties in simple routine activities, which are carried out with effort.
+5 - Between 4 and 6.
+6 - Complete lassitude. Unable to do anything without help.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's lassitude on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+430.  42:40.429 --> 42:52.495 Practitioner: Have you had any trouble getting started at things in the past week?
+431.  42:52.555 --> 42:52.655 Patient: Um...
+432.  42:54.727 --> 43:02.631 Patient: getting started on things in the past week.
+433.  43:06.392 --> 43:08.793 Patient: There's not a whole lot here for me to get started on.
+434.  43:09.334 --> 43:14.456 Patient: It's kind of just report to this room at this time for this, and that room at that time for that.
+435.  43:15.657 --> 43:19.398 Patient: So there's very little self-starting needed in here.
+436.  43:19.418 --> 43:19.458 Patient: OK.
+437.  43:19.899 --> 43:22.740 Practitioner: Have you had to push yourself to do anything?
+438.  43:24.568 --> 43:30.751 Practitioner: even everyday routine things like taking care of yourself, getting out of bed, taking a shower, brushing your teeth, anything like that?
+439.  43:31.651 --> 43:37.174 Patient: Sometimes it is a little tricky to remember to get in the shower on days that I plan on getting in the shower and stuff.
+440.  43:38.894 --> 43:43.917 Patient: Just finding the time and not thinking about anything else that I'm supposed to be at or doing and stuff.
+441.  43:43.937 --> 43:44.817 Patient: Sometimes it gets tricky.
+442.  43:46.367 --> 43:48.488 Practitioner: If you don't feel like it's helpful to do those things.
+443.  43:49.489 --> 43:50.189 Patient: Yeah, no.
+444.  43:50.209 --> 43:54.471 Patient: You just have to remember and then if you go to do them, you can do them.
+445.  43:55.051 --> 43:56.092 Patient: Pretty much, yeah.
+446.  43:56.132 --> 44:02.135 Patient: I just have to remember to do them and prioritize them when I plan on prioritizing them.
+447.  44:02.475 --> 44:02.715 Patient: Okay.
+448.  44:04.536 --> 44:10.899 Practitioner: Are you done everyday things more slowly than usual?
+449.  44:14.441 --> 44:14.741 Patient: Not
+450.  44:15.736 --> 44:16.797 Patient: Measurably.
+451.  44:17.217 --> 44:18.197 Patient: Not that I've noticed.
+452.  44:19.017 --> 44:29.122 Practitioner: Have you been less interested in things around you or activities that you used to enjoy?
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452]
+Most Relevant Question: Are you done everyday things more slowly than usual?
+
+Transcript:
+...
+128.  17:37.145 --> 17:44.149 Practitioner: And any difficulty with starting things like tasks that you're doing throughout the day or activities?
+129.  17:46.831 --> 17:47.431 Patient: Not really.
+130.  17:51.634 --> 17:57.657 Practitioner: What about like feeling you had to push yourself to do things or feeling lethargic, things like that?
+131.  17:57.677 --> 18:03.481 Patient: I think midday I get kind of lethargic.
+132.  18:05.394 --> 18:09.216 Patient: In the mornings, I'm kind of wide awake and ready to go.
+133.  18:09.236 --> 18:18.021 Patient: And then because I've been up since like 4 a.m., by 3 p.m., I'm really tired.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [128, 129, 130, 131, 132, 133]
+Most Relevant Question: What about like feeling you had to push yourself to do things or feeling lethargic things like that?
+
+Transcript:
+...
+111.  14:42.296 --> 14:49.802 Practitioner: And any times this last week where you had trouble getting started on things, like things you needed to do, like daily tasks throughout the day?
+112.  14:52.123 --> 14:54.885 Patient: Yeah, it's very hard to get started on things.
+113.  14:59.229 --> 15:00.289 Practitioner: Any kind of things in particular?
+114.  15:00.309 --> 15:05.133 Patient: Like showering, that kind of thing, eating.
+115.  15:08.473 --> 15:13.154 Practitioner: And do you find that it's just the starting on it that's difficult, or is it also difficult to complete it as well?
+116.  15:14.594 --> 15:16.335 Patient: It's just the starting on it that's hard.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [111, 112, 113, 114, 115, 116]
+Most Relevant Question: And do you find that it's just the starting on it that's difficult, or is it also difficult to complete it as well?
+
+Transcript:
+...
+80.  08:55.804 --> 08:59.965 Practitioner: And any difficulty with getting things started in the last week, like daily tasks, things like that?
+81.  09:02.779 --> 09:05.320 Practitioner: What about needing to push yourself to get things done?
+82.  09:06.981 --> 09:07.962 Patient: Like get up in the morning?
+83.  09:08.222 --> 09:08.982 Patient: Yeah.
+84.  09:13.305 --> 09:15.026 Practitioner: Is it just sometimes hard to get up in the morning?
+85.  09:15.126 --> 09:15.966 Patient: All the time.
+86.  09:19.528 --> 09:26.392 Practitioner: Do you find that once you get up and start walking around it's easier to do things or is it still difficult?
+87.  09:30.430 --> 09:36.553 Practitioner: And do you think in the last week you've been moving or talking slower than usual?
+88.  09:36.573 --> 09:40.855 Practitioner: How about feeling sluggish or lethargic?
+89.  09:45.638 --> 09:45.758 Patient: No.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [80, 81, 82, 83, 84, 85, 86, 87, 88, 89]
+Most Relevant Question: And do you think in the last week you've been moving or talking slower than usual?
+
+Transcript:
+...
+260.  20:44.926 --> 20:49.690 Practitioner: Have you had any trouble getting started at things in the past week?
+261.  20:50.151 --> 20:50.331 Patient: No.
+262.  20:51.572 --> 20:53.554 Patient: Well, initially, yes.
+263.  20:53.614 --> 20:53.954 Unclear: Yeah, okay.
+264.  21:01.670 --> 21:05.214 Practitioner: Have you had to push yourself to do things, even routine things?
+265.  21:06.716 --> 21:09.599 Practitioner: Getting out of bed, getting dressed, that sort of stuff?
+266.  21:09.639 --> 21:11.201 Patient: Yeah.
+267.  21:12.803 --> 21:17.168 Practitioner: Have you found that once you get started on those things, you're okay and it just takes that first push?
+268.  21:17.268 --> 21:20.112 Practitioner: Or do you feel like some of those things just take an effort to get all the way through?
+269.  21:25.171 --> 21:35.819 Patient: At first, yeah, it's a lot of effort, and sometimes, for the first few days, frankly, I mean, I just, I don't even do anything that I don't want to do, you know, what is here, so.
+270.  21:36.220 --> 21:36.560 Unclear: Yeah.
+271.  21:37.100 --> 21:37.360 Unclear: Yeah.
+272.  21:39.042 --> 21:41.163 Practitioner: Have you done everyday things more slowly than usual?
+273.  21:45.207 --> 21:45.667 Practitioner: Overall?
+274.  21:46.848 --> 21:47.568 Practitioner: Or at any point?
+275.  21:47.608 --> 21:48.749 Patient: Yeah, yes.
+276.  21:49.110 --> 21:49.230 Unclear: Yeah.
+277.  21:50.928 --> 21:52.309 Practitioner: Also near the beginning?
+278.  21:52.329 --> 21:56.310 Patient: No, near the beginning.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279]
+Most Relevant Question: Or do you feel like some of those things just take an effort to get all the way through?
+
+Transcript:
+...
+129.  10:43.871 --> 10:45.872 Practitioner: Does that feeling lift at all if something good happens?
+352.  26:22.509 --> 26:25.131 Patient: I haven't done much, so it's kind of no baseline for it.
+355.  26:35.261 --> 26:36.762 Practitioner: Have you had to push yourself to do things?
+356.  26:37.322 --> 26:41.186 Patient: Yeah.
+358.  26:42.607 --> 26:44.669 Patient: Even getting up to do check-ins, you know.
+359.  26:46.831 --> 26:48.012 Patient: Get up to take meds, that sort of thing.
+360.  26:52.455 --> 26:53.716 Practitioner: How hard have you had to push yourself?
+361.  26:54.696 --> 26:55.116 Patient: Pretty hard.
+362.  26:56.757 --> 26:56.957 Patient: Yeah.
+363.  26:57.577 --> 27:00.399 Practitioner: Are you okay once you get started or is it more effort to get through something?
+364.  27:01.399 --> 27:02.500 Patient: It's easier once I get started.
+365.  27:03.140 --> 27:06.261 Patient: I think it's just a daunting task in front of you.
+366.  27:08.782 --> 27:11.223 Patient: But once I get up and start doing it, it'll be fine.
+367.  27:11.243 --> 27:13.464 Patient: I don't know what it's going to be like.
+375.  27:32.536 --> 27:42.998 Practitioner: Have you done everyday things more slowly than usual?
+376.  27:49.640 --> 27:50.420 Patient: No, I don't think so.
+377.  27:59.153 --> 28:06.615 Practitioner: And as far as having to push yourself to do things, what about getting started at routine everyday things like getting dressed?
+378.  28:07.015 --> 28:07.995 Patient: Yeah, those have been difficult.
+379.  28:08.035 --> 28:08.375 Patient: Yeah.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [129, 352, 355, 356, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 375, 376, 377, 378, 379, 380]
+Most Relevant Question: Are you okay once you get started or is it more effort to get through something?
+
+Transcript:
+...
+204.  15:37.975 --> 15:39.935 Practitioner: Any trouble getting started at things this week?
+205.  15:40.635 --> 15:41.036 Patient: What do you mean?
+207.  15:44.976 --> 15:46.017 Patient: Yeah, it's pretty hard.
+208.  15:46.977 --> 15:48.937 Practitioner: Um, have you had to push yourself to do things?
+209.  15:51.398 --> 15:53.218 Practitioner: Like, maybe like routine stuff?
+210.  15:53.559 --> 15:54.699 Patient: I don't even do any of that.
+214.  16:09.735 --> 16:11.796 Practitioner: Have you done everyday things more slowly than usual?
+215.  16:12.797 --> 16:14.458 Practitioner: If you are able to do them at all?
+216.  16:15.678 --> 16:16.138 Patient: I guess.
+217.  16:16.199 --> 16:19.780 Patient: I mean, for the most part, I don't do any just usual stuff.
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [204, 205, 207, 208, 209, 210, 214, 215, 216, 217]
+Most Relevant Question: Any trouble getting started at things this week?

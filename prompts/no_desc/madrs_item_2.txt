@@ -1,0 +1,199 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Reported Sadness
+
+Questions:
+In the past week, have you been feeling sad or unhappy?
+Can you describe what this has been like for you?
+Does the feeling lift at all if something good happens?
+How much does your mood lift? Does the feeling ever go away completely?
+What things have made you feel better?
+How often did you feel (depressed/OWN EQUIVALENT) this past week?
+How many days this week did you feel that way? How much of each day?
+How have you been feeling about the future?
+Have you been discouraged or pessimistic?
+Do you think things will ever get better for you?
+How long have you been feeling this way?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's reported sadness on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+137.  11:08.496 --> 11:10.757 Practitioner: In the past week, have you been feeling sad or unhappy?
+138.  11:12.938 --> 11:14.019 Patient: No, I'm tired.
+125.  10:45.435 --> 10:47.717 Patient: No, I think I probably might look tired.
+126.  10:47.737 --> 10:47.817 Practitioner: Okay.
+132.  10:59.192 --> 11:02.313 Practitioner: And how about when you looked in the mirror, did you look gloomy or depressed to yourself?
+133.  11:02.573 --> 11:04.735 Patient: No, I think I just looked tired.
+134.  11:05.015 --> 11:05.295 Practitioner: Okay.
+137.  11:08.496 --> 11:10.757 Practitioner: In the past week, have you been feeling sad or unhappy?
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [137, 138, 125, 126, 132, 133, 134, 137]
+Most Relevant Question: In the past week, have you been feeling sad or unhappy?
+
+Transcript:
+...
+72.  08:58.787 --> 09:01.990 Practitioner: Anything in the last week that's made you feel particularly sad or depressed?
+73.  09:04.391 --> 09:08.935 Patient: Having to argue with my parents about what I'm thinking about discharge.
+74.  09:14.899 --> 09:16.240 Practitioner: Was that yesterday or the day before?
+75.  09:16.941 --> 09:18.162 Patient: Yesterday, mostly.
+82.  09:57.643 --> 10:01.664 Practitioner: And in the last week, do you think that you might have appeared to be sad or depressed to other people?
+83.  10:02.024 --> 10:02.244 Patient: Yeah.
+84.  10:03.865 --> 10:04.565 Practitioner: How often would you say?
+85.  10:04.585 --> 10:06.546 Patient: A couple times a day.
+95.  10:46.517 --> 10:47.017 Patient: Not really.
+96.  10:47.437 --> 10:47.598 Practitioner: No?
+97.  10:54.359 --> 10:56.959 Practitioner: What about feeling like sad or empty?
+98.  10:56.979 --> 10:58.239 Patient: A little bit.
+99.  10:58.640 --> 10:58.900 Practitioner: Okay.
+100.  10:59.980 --> 11:00.940 Practitioner: How often would you say that happens?
+101.  11:02.071 --> 11:03.132 Patient: Once a day, on average.
+102.  11:07.594 --> 11:15.798 Practitioner: So when you are kind of feeling, you know, that empty kind of feeling, do you notice that things improve if something good happens?
+103.  11:15.818 --> 11:18.740 Patient: Yeah, I usually just kind of wait it out.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [72, 73, 74, 75, 82, 83, 84, 85, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+Most Relevant Question: Anything in the last week that's made you feel particularly
+
+Transcript:
+...
+182.  13:23.332 --> 13:28.113 Practitioner: And over the last week, would you say that you've been feeling sad or depressed at all?
+183.  13:28.153 --> 13:28.633 Patient: A little bit.
+184.  13:47.133 --> 13:49.075 Practitioner: Would you say, like, just some days of the week?
+186.  13:57.084 --> 13:59.627 Practitioner: Do you find that your mood improves at all if, like, something good happens?
+187.  14:00.228 --> 14:00.988 Unclear: Mm-hmm.
+188.  14:03.912 --> 14:05.974 Patient: How long that is, I don't know, though.
+189.  14:06.755 --> 14:08.657 Patient: Sometimes it lasts, sometimes it doesn't.
+194.  14:30.517 --> 14:36.078 Practitioner: Would you say in the last week that you've been feeling pessimistic about the future, feeling very discouraged?
+195.  14:36.378 --> 14:36.698 Patient: No.
+196.  14:37.819 --> 14:38.379 Patient: Optimistic.
+157.  12:08.855 --> 12:09.776 Patient: Maybe, yeah.
+158.  12:13.038 --> 12:15.920 Practitioner: Did anybody ever say anything or said that you people?
+177.  13:09.483 --> 13:10.104 Patient: Sometimes.
+178.  13:10.744 --> 13:11.685 Patient: I look spaced out.
+179.  13:13.766 --> 13:15.488 Patient: That's what it is more than anything else.
+180.  13:18.911 --> 13:21.632 Practitioner: Any difficulty with being able to laugh or smile in the last week?
+181.  13:22.972 --> 13:23.252 Patient: That's good.
+182.  13:23.332 --> 13:28.113 Practitioner: And over the last week, would you say that you've been feeling sad or depressed at all?
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [182, 183, 184, 186, 187, 188, 189, 194, 195, 196, 157, 158, 177, 178, 179, 180, 181, 182]
+Most Relevant Question: And over the last week, would you say that you've been feeling sad or depressed at all?
+
+Transcript:
+...
+140.  12:06.882 --> 12:09.042 Practitioner: In the past week, have you been feeling sad or unhappy?
+141.  12:09.723 --> 12:10.203 Patient: A little bit.
+142.  12:13.044 --> 12:13.704 Practitioner: Tell me about that.
+143.  12:13.744 --> 12:14.444 Practitioner: What's that been like?
+144.  12:16.565 --> 12:17.225 Patient: Self-draining.
+145.  12:22.847 --> 12:25.567 Practitioner: On a scale of 1 to 10, how bad has that been this week?
+146.  12:26.247 --> 12:26.327 Patient: A 6.
+147.  12:30.669 --> 12:32.009 Practitioner: Do you feel like that all the time?
+148.  12:32.109 --> 12:33.049 Practitioner: Does it ever go away?
+149.  12:33.069 --> 12:34.310 Patient: It goes away sometimes.
+150.  12:38.491 --> 12:39.971 Practitioner: How much of the time have you felt that way?
+151.  12:43.820 --> 12:44.180 Patient: Don't know.
+152.  12:44.560 --> 12:45.141 Patient: Don't know.
+153.  12:46.162 --> 12:50.024 Practitioner: Do you feel like it's most of this week that you've been feeling sad?
+154.  12:52.386 --> 12:53.046 Patient: Uh, yeah.
+155.  13:15.100 --> 13:16.122 Practitioner: How do you feel about the future?
+156.  13:18.166 --> 13:23.798 Patient: It's prominent Do you think things will ever get better for you?
+157.  13:24.499 --> 13:24.679 Patient: Yes
+158.  13:43.334 --> 13:49.798 Practitioner: If you're feeling sad and something good happens, does it lift your mood or does it stay the same?
+159.  13:49.818 --> 13:51.499 Patient: It lifts my mood.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159]
+Most Relevant Question: In the past week, have you been feeling sad or unhappy?
+
+Transcript:
+...
+52.  04:47.420 --> 04:47.940 Practitioner: And for you?
+53.  04:50.041 --> 04:50.701 Patient: It's been tough.
+54.  04:51.581 --> 04:53.862 Patient: Divorce and separation isn't an easy thing.
+249.  13:49.032 --> 13:56.114 Patient: You know, it's affected me because a whole city hates me because of the lawsuit that I put out for when I fell down the stairs.
+299.  16:47.952 --> 16:50.196 Practitioner: Have you been feeling sad or unhappy in the past week?
+300.  16:50.637 --> 16:50.958 Patient: Yes.
+301.  16:51.198 --> 16:52.741 Practitioner: How much of the time does that happen?
+302.  16:53.142 --> 16:56.788 Patient: Every day I feel a little sad because I want these voices to go away.
+303.  16:56.808 --> 16:58.552 Practitioner: How long does that last?
+313.  17:27.952 --> 17:29.093 Patient: An hour, two hours?
+314.  17:29.193 --> 17:30.574 Practitioner: How long would you say you're sad?
+315.  17:30.594 --> 17:31.334 Patient: A couple hours.
+318.  17:32.695 --> 17:32.815 Unclear: Okay.
+319.  17:35.297 --> 17:37.138 Practitioner: And every day or just some days?
+320.  17:37.158 --> 17:38.159 Patient: Yes, every day.
+321.  17:38.179 --> 17:38.559 Patient: Every day.
+323.  17:43.583 --> 17:43.943 Patient: Yes.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [52, 53, 54, 249, 299, 300, 301, 302, 303, 313, 314, 315, 318, 319, 320, 321, 323]
+Most Relevant Question: Have you been feeling sad or unhappy in the past week?
+
+Transcript:
+...
+49.  07:38.334 --> 07:42.017 Practitioner: And were there any times in the last week where you were feeling particularly sad or depressed?
+50.  07:47.062 --> 07:49.424 Patient: No, that's more of a general overall feeling.
+51.  07:55.029 --> 08:01.234 Practitioner: So with that general feeling, is that something that's kind of always there, or is it comes and goes?
+52.  08:02.255 --> 08:03.216 Patient: It comes and goes.
+53.  08:07.475 --> 08:10.197 Practitioner: So how often this last week would you say you felt in a lower mood?
+54.  08:16.861 --> 08:19.183 Patient: Most of the day.
+55.  08:25.967 --> 08:32.351 Practitioner: And during the times when you are feeling sad or depressed, would you say that your mood improves at all if something good happens?
+56.  08:35.733 --> 08:36.854 Patient: If I'm distracted.
+57.  08:37.705 --> 08:48.192 Patient: If I'm reading, if I'm able to read, and I have been able to, which is a positive, then I forget about, you know, I'm distracted from the lower mood.
+58.  08:58.198 --> 09:06.243 Practitioner: Were there any times this last week where, like, other people made comments or asked if you were feeling okay or said that you looked down or anything like that?
+61.  09:33.709 --> 09:34.209 Patient: Probably.
+62.  09:40.131 --> 09:42.872 Practitioner: Would you say that's just some of the time or a lot of the time?
+63.  09:44.753 --> 09:46.194 Patient: Probably a lot of the time.
+64.  09:51.176 --> 09:55.618 Practitioner: And what about personally, if you look in a mirror, do you think that you look depressed or gloomy?
+65.  09:57.539 --> 09:59.360 Patient: No, to me, I just look normal.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65]
+Most Relevant Question: And were there any times in the last week where you were feeling particularly sad or depressed?
+
+Transcript:
+...
+61.  06:25.287 --> 06:26.888 Practitioner: Have you been feeling sad or unhappy?
+62.  06:27.248 --> 06:27.508 Patient: Yes.
+63.  06:29.629 --> 06:30.530 Practitioner: How bad has that been?
+64.  06:31.530 --> 06:33.951 Patient: Very, very bad.
+65.  06:34.852 --> 06:35.612 Practitioner: Also a 10?
+66.  06:36.193 --> 06:36.453 Patient: Yes.
+67.  06:41.315 --> 06:42.356 Practitioner: Does that ever change?
+68.  06:43.997 --> 06:48.219 Patient: No, you know, just if anything, it's getting worse.
+69.  06:48.919 --> 06:50.180 Patient: More bad news from the house.
+70.  06:58.942 --> 07:00.883 Practitioner: How often have you felt that way in the last week?
+71.  07:02.763 --> 07:03.763 Patient: Pretty much all the time.
+72.  07:10.885 --> 07:12.065 Patient: Even my dreams are sad.
+73.  07:12.085 --> 07:16.446 Practitioner: How do you feel about the future?
+74.  07:17.507 --> 07:18.207 Patient: Not very good.
+75.  07:23.328 --> 07:24.088 Practitioner: What are your thoughts?
+76.  07:25.149 --> 07:26.609 Patient: For me that there is no future.
+77.  07:33.046 --> 07:34.806 Practitioner: Do you think things will ever get better for you?
+78.  07:35.386 --> 07:35.927 Patient: I don't think so.
+79.  07:35.947 --> 07:46.209 Practitioner: Have you felt tense, edgy, anxious, or nervous?
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79]
+Most Relevant Question: How bad has that been?

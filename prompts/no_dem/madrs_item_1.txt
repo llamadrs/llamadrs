@@ -1,0 +1,37 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Apparent Sadness
+
+Description:
+Representing despondency, gloom and despair. (More than just ordinary transient low spirits) reflected in speech, facial expressions and posture. Rate by depth and inability to brighten up.
+
+Questions:
+In the past week, do you think you have looked sad or depressed to other people?
+Did anyone say you looked sad or down?
+How about when you've looked in the mirror? Did you look gloomy or depressed?
+How sad or depressed do you think you have looked?
+How much of the time over the past week do you think you have looked depressed or down?
+Have you been able to laugh or smile at all during the past week?
+How hard has it been for you to laugh or smile, even if you weren't feeling happy inside?
+
+Rating Scale:
+0 - No sadness.
+1 - Between 0 and 2.
+2 - Looks dispirited but does brighten up without difficulty.
+3 - Between 2 and 4.
+4 - Appears sad and unhappy most of the time.
+5 - Between 4 and 6.
+6 - Looks miserable all the time. Extremely despondent.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's apparent sadness on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

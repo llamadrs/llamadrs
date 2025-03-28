@@ -1,0 +1,171 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Inability to Feel
+
+Questions:
+Have you been less interested in things around you, or in activities you used to enjoy?
+What things?
+How bad has that been?
+How much less interested in (those things) are you now compared with before?
+Have you been less able to enjoy the things you usually enjoy?
+Has there been any change in your ability to feel emotions?
+Do you feel things less intensely than you used to, things like anger, grief, pleasure?
+Can you tell me more about that?
+Are you able to feel any emotions at all?
+How do you feel towards your family and friends?
+Is that different from usual?
+Do you feel less than you used to towards them?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's inability to feel on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+103.  12:07.468 --> 12:12.653 Practitioner: Any times this last week that you were feeling less interested in hobbies, activities that you usually enjoy?
+104.  12:12.673 --> 12:22.342 Patient: No, I'm starting to enjoy things more than I used to, like walks and things like that, getting outside, fresh air.
+105.  12:24.865 --> 12:26.546 Patient: To me, that's a good sign.
+106.  12:26.566 --> 12:29.970 Patient: It also helps that the weather's getting better.
+107.  12:29.990 --> 12:31.271 Patient: Yeah, it does, yeah.
+108.  12:34.418 --> 12:41.761 Practitioner: And any times this last week where your emotions were like kind of numbed down or less intense than they usually are?
+109.  12:43.182 --> 12:45.143 Patient: No, it's been about even.
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [103, 104, 105, 106, 107, 108, 109, 110]
+Most Relevant Question: Any times this last week that you were feeling less interested in hobbies, activities that you usually enjoy?
+
+Transcript:
+...
+265.  16:16.626 --> 16:20.748 Practitioner: Have you been less interested in things around you or in activities you used to enjoy?
+266.  16:20.768 --> 16:22.689 Patient: No, I've been more interested.
+267.  16:23.669 --> 16:24.630 Practitioner: Anything that's left?
+269.  16:29.292 --> 16:33.814 Patient: Well, I found myself talking to more people, sharing.
+270.  16:34.194 --> 16:34.334 Practitioner: Okay.
+271.  16:34.667 --> 16:38.750 Practitioner: But do you think that your level of interest is as good as it can be for you?
+272.  16:39.370 --> 16:42.252 Patient: I think it's pretty good right now, but it can get better.
+273.  16:42.792 --> 16:43.173 Practitioner: How much?
+274.  16:44.573 --> 16:46.034 Patient: Probably at 80% now.
+275.  16:46.455 --> 16:47.796 Patient: I'll be at 100 shortly.
+276.  16:49.297 --> 16:54.400 Patient: Let me get back out there and get back at meetings and I'll be really good.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [265, 266, 267, 269, 270, 271, 272, 273, 274, 275, 276]
+Most Relevant Question: But do you think that your level of interest is as good as it can be for you?
+
+Transcript:
+...
+295.  21:39.666 --> 21:44.070 Practitioner: And would you say that you felt any less interested in hobbies or certain activities?
+296.  21:44.450 --> 21:46.672 Patient: All the time, especially with all my Vyvanse.
+297.  21:46.993 --> 21:48.814 Patient: I contribute that to the lack of Vyvanse.
+298.  21:49.675 --> 21:51.116 Patient: I can't even get started.
+299.  21:51.156 --> 21:52.237 Patient: I'm so tired right now.
+300.  21:52.277 --> 21:53.098 Patient: I could fall asleep.
+308.  22:16.604 --> 22:17.044 Patient: Everything.
+309.  22:17.804 --> 22:18.564 Patient: Anything I do.
+310.  22:19.785 --> 22:26.927 Patient: Everything that I like to do, you know, play catch in the gym, shoot some basketballs in the gym or out on the court.
+311.  22:28.167 --> 22:29.387 Patient: I like doing things like that.
+312.  22:29.627 --> 22:35.509 Patient: I usually do it at home with my grandson, but right now I don't really want to go out because I'm tired and groggy.
+313.  22:36.345 --> 22:42.129 Patient: I just want to go – actually, I want to go back to my room and go to sleep right now because the longer this goes on, the worse I get.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [295, 296, 297, 298, 299, 300, 308, 309, 310, 311, 312, 313]
+Most Relevant Question: And would you say that you felt any less interested in hobbies or certain activities?
+
+Transcript:
+...
+173.  19:55.238 --> 19:57.138 Patient: I don't have a lot of hobbies.
+174.  20:04.341 --> 20:11.003 Patient: I think I'm enjoying them as much as I would have last week or the week before.
+175.  20:12.694 --> 20:13.394 Patient: which is low.
+176.  20:13.414 --> 20:23.537 Patient: Or that level is low, you know.
+177.  20:23.557 --> 20:26.798 Patient: And any times this last week that you were feeling numb or emotions were less intense?
+178.  20:27.219 --> 20:29.939 Patient: Yeah, I go through periods like that a lot.
+179.  20:30.860 --> 20:33.961 Patient: It kind of feels like I'm in shock, but I don't know what I'm in shock from.
+180.  20:33.981 --> 20:40.983 Patient: And is it just certain emotions that feel kind of toned down, or is it everything that feels numb?
+181.  20:42.194 --> 20:58.180 Patient: Um, emotions, it, like, I literally, it's kind of, is like a mania because I feel like I can function more clearly, but, um, function better.
+182.  20:58.240 --> 21:09.305 Patient: But, um, I know that I am either unable to feel certain emotions in general or avoiding feeling emotions.
+183.  21:13.491 --> 21:20.037 Practitioner: And any times in the last week where you were feeling differently towards friends or family, feeling less interested, not wanting to hear from them?
+184.  21:21.958 --> 21:22.399 Patient: Not really.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184]
+Most Relevant Question: Is it just certain emotions that feel kind of toned down, or is it everything that feels numb?
+
+Transcript:
+...
+454.  41:34.980 --> 41:38.682 Practitioner: Have you been less interested in things around you or in activities you used to enjoy?
+455.  41:40.911 --> 41:43.833 Patient: I mean, I think that prior to here, I did semi-enjoy.
+458.  41:49.075 --> 41:54.658 Patient: And then, I don't know, groups, usually therapy stuff would be like least curious for me.
+459.  41:54.678 --> 41:58.340 Patient: But I'm just like, I'm going because I want to get out of here.
+460.  41:58.360 --> 41:58.400 Patient: So...
+467.  42:57.576 --> 42:59.337 Practitioner: And how do you feel towards your family and friends?
+468.  42:59.377 --> 43:05.642 Practitioner: Do you feel any... Do you feel at all apathetic towards them in a way that's unusual, or...
+469.  43:06.590 --> 43:07.670 Practitioner: feeling less for them?
+471.  43:15.533 --> 43:20.514 Patient: Obviously not the ultimate goal, I hope, but I want to get to where I can start living for myself.
+472.  43:20.554 --> 43:24.195 Patient: But I would say my parents, they very much don't believe in mental illness.
+473.  43:24.456 --> 43:25.596 Patient: They don't even know that I'm here.
+474.  43:26.436 --> 43:30.878 Patient: I decided to relieve myself of the anxiety to not even tell them.
+475.  43:32.658 --> 43:37.661 Patient: You know, my family is, yeah, my parents, like, they just are not supportive at all.
+476.  43:38.001 --> 43:44.484 Patient: You know, my husband hasn't come to visit me because he has a lot of trauma himself, and I'm totally fine with that.
+477.  43:44.524 --> 43:45.404 Patient: He's taking care of her son.
+478.  43:45.424 --> 43:46.145 Patient: That's enough for me.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [454, 455, 458, 459, 460, 467, 468, 469, 471, 472, 473, 474, 475, 476, 477, 478, 479, 491, 492]
+Most Relevant Question: Do you feel any... Do you feel at all apathetic towards them in a way that's unusual, or... feel less for them?
+
+Transcript:
+...
+397.  33:55.501 --> 33:58.262 Practitioner: How is that going, your interest in things around you?
+398.  34:00.976 --> 34:14.711 Patient: I used to have great enjoyment in building models, like model cars, things like that, and playing video games, certain ones, on computer.
+399.  34:17.554 --> 34:21.277 Patient: And now I find that I'm just not focusing on them.
+400.  34:22.138 --> 34:23.520 Patient: I'll try, but it's like,
+401.  34:24.844 --> 34:25.745 Patient: I get distracted.
+402.  34:25.805 --> 34:27.826 Patient: My brain just says, oh, you got to do this.
+403.  34:27.946 --> 34:28.867 Patient: Oh, you got to do that.
+404.  34:29.207 --> 34:35.632 Patient: Oh, you know, and it's like, but I'm supposed to be in game and it's not happening.
+405.  34:36.432 --> 34:38.474 Practitioner: And here in the office?
+406.  34:39.354 --> 34:53.725 Patient: No, when I'm sitting in the library hooked up to the internet, I have my computer out and I'm supposed to be focusing on one thing and instead I'm focusing on 12 things at once.
+407.  34:55.162 --> 35:08.531 Practitioner: Do you feel that, say, when you're here and you're reading or you're writing or you're speaking with other people, do you find that you're less interested, like this kind of sparky, sparky feeling of enjoyment?
+408.  35:08.551 --> 35:11.212 Practitioner: Do you feel that that's kind of decreased?
+409.  35:11.392 --> 35:12.393 Patient: It's very decreased.
+410.  35:12.413 --> 35:13.334 Practitioner: Very decreased, huh?
+411.  35:13.634 --> 35:13.934 Patient: Yeah.
+412.  35:14.054 --> 35:17.837 Practitioner: That's kind of the sense that you're talking about, I guess.
+413.  35:17.937 --> 35:20.999 Patient: I don't find anything really enjoyable anymore.
+414.  35:21.019 --> 35:24.801 Practitioner: Okay, so it's kind of a more flat type of feeling.
+415.  35:26.107 --> 35:41.939 Practitioner: When you see, like, your sister or you just, you know, maybe speak with family or you see people, maybe somebody that, you know, you know that you can expect to have a positive feeling, do you feel any positive feeling or is it difficult?
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415]
+Most Relevant Question: Do you feel that, say, when you're here and you're reading or you're writing or you're speaking with other people, do you find that you're less interested, like this kind of sparky, sparky feeling of enjoyment?
+
+Transcript:
+...
+129.  11:19.184 --> 11:23.986 Practitioner: Have you been less interested in things or in activities you used to enjoy?
+78.  07:35.519 --> 07:39.161 Patient: I don't feel anything.
+79.  07:39.181 --> 07:40.082 Patient: I'm just numb.
+80.  07:40.442 --> 07:40.682 Practitioner: Okay.
+135.  11:57.605 --> 12:02.809 Practitioner: You said you feel like completely numb, like you can't experience almost any emotion.
+136.  12:02.829 --> 12:06.012 Patient: I can't experience any emotion.
+137.  12:06.912 --> 12:07.673 Patient: I feel numb.
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [129, 78, 79, 80, 135, 136, 137]
+Most Relevant Question: Have you been less interested in things or in activities you used to enjoy?
+

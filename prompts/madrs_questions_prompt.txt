@@ -1,0 +1,215 @@
+Your task is to analyze questions by practitioner from therapeutic sessions and classify them according to the Montgomery–Åsberg Depression Rating Scale (MADRS) items. Each question should be categorized into the most relevant MADRS item based on its content and intent:
+
+For context, the questions may come from various scales such as PANSS (Positive and Negative Syndrome Scale), YMRS (Young Mania Rating Scale), and MADRS (Montgomery–Åsberg Depression Rating Scale). However, your task is to focus on MADRS items. If a question does not match any MADRS item, label it as -1.
+
+For PANSS, the items to be ignored are:
+- Delusions  
+- Conceptual Disorganization  
+- Hallucinations  
+- Blunted Affect  
+- Social Withdrawal  
+- Poor Speech Flow  
+
+For YMRS, the items to be ignored are:
+- Elevated Mood  
+- Increased Activity or Energy  
+- Increased Sexual Interest  
+- Decreased Need for Sleep  
+- Irritability  
+- Increased Speech  
+- Disorganized Language (Thought Disorder)  
+- Grandiosity or Contentment  
+- Aggressive Behavior  
+- Overconfidence or Inappropriate Appearance  
+- Poor Insight
+
+For MADRS, the item numbers and descriptions are:
+Name: Apparent Sadness
+Label: 1
+Description: Representing despondency, gloom and despair. (More than just ordinary transient low spirits) reflected in speech, facial expressions and posture. Rate by depth and inability to brighten up.
+
+Questions:
+In the past week, do you think you have looked sad or depressed to other people?
+Did anyone say you looked sad or down?
+How about when you've looked in the mirror? Did you look gloomy or depressed?
+How sad or depressed do you think you have looked?
+How much of the time over the past week do you think you have looked depressed or down?
+Have you been able to laugh or smile at all during the past week?
+How hard has it been for you to laugh or smile, even if you weren't feeling happy inside?
+
+Name: Reported Sadness
+Label: 2
+Description: Representing reports of depressed mood, regardless of whether it is reflected in appearance or not. Includes low spirits, despondency or the feeling of being beyond help and without hope. Rate according to intensity, duration and the extent to which the mood is reported to be influenced by events.
+
+Questions:
+In the past week, have you been feeling sad or unhappy?
+Can you describe what this has been like for you?
+Does the feeling lift at all if something good happens?
+How much does your mood lift? Does the feeling ever go away completely?
+What things have made you feel better?
+How often did you feel (depressed/OWN EQUIVALENT) this past week?
+How many days this week did you feel that way? How much of each day?
+How have you been feeling about the future?
+Have you been discouraged or pessimistic?
+Do you think things will ever get better for you?
+How long have you been feeling this way?
+
+Name: Inner Tension
+Label: 3
+Description: Representing feelings of ill-defined discomfort, edginess, inner turmoil, mental tension mounting to either panic, dread or anguish. Rate according to intensity, frequency, duration and the extent of reassurance called for.
+
+Questions:
+Have you felt tense or edgy in the past week?
+Have you felt anxious or nervous?
+Can you describe what that has been like for you?
+How bad has your anxiety been?
+Have you felt panicky?
+What about feeling fearful that something bad is about to happen?
+How hard has it been to control these feelings?
+What has it taken to help you feel calmer?
+Has anything worked to calm you down?
+How much of the time have you felt this way over the past week?
+
+Name: Reduced Sleep
+Label: 4
+Description: Representing the experience of reduced duration or depth of sleep compared to the subject's own normal pattern when well.
+
+Questions:
+How has your sleeping been in the past week?
+How many hours have you been sleeping, compared with usual?
+Have you had trouble falling asleep?
+How long has it been taking you to fall asleep this past week?
+Have you been able to stay asleep through the night?
+Have you been waking up at all in the middle of the night?
+How long does it take you to go back to sleep?
+Has your sleeping been restless or disturbed?
+
+Name: Reduced Appetite
+Label: 5
+Description: Representing the feeling of a loss of appetite compared with when well. Rate by loss of desire for food or the need to force oneself to eat.
+
+Questions:
+How has your appetite been this past week?
+What about compared with your usual appetite?
+Have you been less interested in food?
+How much less interested in food have you been?
+Does food taste as good as usual?
+How much less good has food been tasting?
+Have you had to force yourself to eat?
+Have other people had to urge you to eat?
+
+Name: Concentration Difficulties
+Label: 6
+Description: Representing difficulties in collecting one's thoughts mounting to incapacitating lack of concentration. Rate according to intensity, frequency, and degree of incapacity produced.
+
+Questions:
+Have you had trouble concentrating or collecting your thoughts in the past week?
+How about at home or at work?
+Have you been able to concentrate on reading a newspaper or magazine?
+Do you need to read things over and over again?
+How often has that happened in the past week?
+Has this caused any problems for you?
+Has your trouble concentrating been so bad at any time in the past week that it has been difficult to follow a conversation?
+
+Name: Lassitude
+Label: 7
+Description: Representing a difficulty getting started, or slowness initiating and performing everyday activities.
+
+Questions:
+Have you had any trouble getting started at things in the past week?
+What things have you had trouble starting?
+Have you had to push yourself to do things?
+What things have you had to push yourself to do?
+How hard have you had to push yourself?
+Are you OK once you get started or is it still more of an effort to get something done?
+What about getting started at simple routine everyday things (like getting dressed)?
+Have you done everyday things more slowly than usual?
+Have you been sluggish?
+Like what, for example, have you been sluggish at?
+How bad has your sluggishness been?
+
+Name: Inability to Feel
+Label: 8
+Description: Representing the subjective experience of reduced interest in the surroundings, or activities that normally give pleasure. The ability to react with adequate emotion to circumstances or people is reduced.
+
+Questions:
+Have you been less interested in things around you, or in activities you used to enjoy?
+What things have you been less interested in?
+How bad has your lack of interest been?
+How much less interested in (those things) are you now compared with before?
+Have you been less able to enjoy the things you usually enjoy?
+Has there been any change in your ability to feel emotions?
+Do you feel things less intensely than you used to, things like anger, grief, pleasure?
+Can you tell me more about getting less pleasure from things?
+Are you able to feel any emotions at all?
+How do you feel towards your family and friends?
+Is that different from how you used to feel?
+Do you feel less than you used to towards them?
+
+Name: Pessimistic Thoughts
+Label: 9
+Description: Representing thoughts of guilt, inferiority, self-reproach, sinfulness, remorse and ruin.
+
+Questions:
+Have you been discouraged or pessimistic?
+Have you been putting yourself down, or feeling that you're a failure in some way, over the past week?
+Have you been blaming yourself for things that you've done, or not done?
+What have your thoughts been [regarding self-blame]?
+How often have you felt that way [regarding pessimistic thoughts]?
+Have you been feeling guilty about anything in the past week?
+What about feeling as if you have done something bad or sinful?
+What have your thoughts been[regarding guilt]?
+How often have you felt that way [regarding guilt]?
+
+Name: Suicidal Thoughts
+Label: 10
+Description: Representing the feeling that life is not worth living, that a natural death would be welcome, suicidal thoughts, and preparation for suicide. Suicidal attempts should not in themselves influence this rating.
+
+Questions:
+This past week, have you felt like life isn't worth living?
+Tell me about that [feelings of life not being worth living]
+What about feeling as if you're tired of living?
+This week, have you thought that you would be better off dead?
+Tell me about that [thoughts of being better off dead]
+Have you had thoughts of hurting or even killing yourself this past week?
+What have you thought about [thoughts of hurting or killing yourself]?
+How often have you had these thoughts [regarding suicidal thoughts]?
+How long have they lasted [regarding suicidal thoughts]?
+Have you actually made plans [regarding suicidal thoughts]?
+What are these plans [regarding suicidal thoughts]?
+Have you made any preparations to carry out these plans?
+Have you told anyone about it [regarding suicidal thoughts]?
+
+Input Format:
+Each input will contain multiple lines of conversation between a practitioner and patient, with timestamps. A question will be specified. You should analyze only the question. Consider the context of surrounding lines if they help clarify the intent of the target question. If the target line is a follow-up question, assign it to the same category as the initial question. If multiple MADRS items are relevant, output all numbers in comma-separated format. Output only the numbers (1-10) or -1, with no additional text. Only output -1 if the question doesn't correspond to any MADRS items.
+
+Example 1:
+Context:
+1. 00:03.740 --> 00:05.181 Practitioner: Okay.
+2. 00:05.221 --> 00:13.087 Practitioner: Just give me a minute, okay?
+3. 00:15.309 --> 00:16.090 Practitioner: Okay.
+4. 00:20.794 --> 00:22.155 Practitioner: Test, test, test.
+Question: 2. 00:05.221 --> 00:13.087 Practitioner: Just give me a minute, okay?
+MADRS Item: -1
+
+Example 2:
+Context:
+437. 32:18.094 --> 32:22.798 Practitioner: Have you felt tense or edgy in the past week?
+438. 32:23.218 --> 32:24.099 Patient: Oh, absolutely.
+439. 32:24.219 --> 32:24.659 Practitioner: Okay.
+440. 32:24.679 --> 32:27.542 Practitioner: Have you felt anxious or nervous?
+441. 32:28.042 --> 32:28.723 Patient: Yeah.
+442. 32:29.003 --> 32:33.226 Patient: I don't feel tense as much as anxious.
+Question: 440. 32:24.679 --> 32:27.542 Practitioner: Have you felt anxious or nervous?
+MADRS Item: 3
+
+Example 3:
+Context:
+721. 45:10.234 --> 45:12.456 Practitioner: How has your mood been?
+722. 45:12.789 --> 45:25.123 Practitioner: Have you been feeling sad or depressed, and have you had trouble sleeping through the night?
+723. 45:25.234 --> 45:26.789 Patient: Yes to both, actually.
+724. 45:26.890 --> 45:28.234 Practitioner: I see.
+Question: 722. 45:12.789 --> 45:25.123 Practitioner: Have you been feeling sad or depressed, and have you had trouble sleeping through the night?
+MADRS Item: 2,4
+
+Your turn:

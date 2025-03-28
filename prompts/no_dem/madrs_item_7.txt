@@ -1,0 +1,41 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Lassitude
+
+Description:
+Representing a difficulty getting started, or slowness initiating and performing everyday activities.
+
+Questions:
+Have you had any trouble getting started at things in the past week?
+What things?
+Have you had to push yourself to do things?
+What things?
+How hard have you had to push yourself?
+Are you OK once you get started or is it still more of an effort to get something done?
+What about getting started at simple routine everyday things (like getting dressed)?
+Have you done everyday things more slowly than usual?
+Have you been sluggish?
+Like what, for example?
+How bad has that been?
+
+Rating Scale:
+0 - Hardly any difficulty in getting started. No sluggishness.
+1 - Between 0 and 2.
+2 - Difficulties in starting activities.
+3 - Between 2 and 4.
+4 - Difficulties in simple routine activities, which are carried out with effort.
+5 - Between 4 and 6.
+6 - Complete lassitude. Unable to do anything without help.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's lassitude on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

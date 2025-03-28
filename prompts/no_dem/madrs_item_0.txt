@@ -1,0 +1,30 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the total MADRS score (0-60) that the practitioner would likely give based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition.
+
+The MADRS consists of 10 items, each scored from 0-6, covering areas such as:
+1. Apparent Sadness
+2. Reported Sadness
+3. Inner Tension
+4. Reduced Sleep
+5. Reduced Appetite
+6. Concentration Difficulties
+7. Lassitude
+8. Inability to Feel
+9. Pessimistic Thoughts
+10. Suicidal Thoughts
+
+The Montgomery-Åsberg Depression Rating Scale (MADRS) is typically interpreted using total score ranges to indicate different levels of depression severity
+0-6: Normal
+7-19: Mild depression
+20-34: Moderate depression
+35-60: Severe depression
+
+Focus on the questions that are directly related to these areas and the patient's answers. Give priority to their answers to the questions that seem to be the most relevant to assessing depression severity.
+
+Instructions:
+1. Read the provided interview transcript.
+2. Predict the total MADRS score (0-60) based on the overall conversation.
+3. Provide a brief explanation (2-3 sentences) for your predicted score.
+
+Output Format:
+Rating: [0-60]
+Explanation: [2-3 sentences]

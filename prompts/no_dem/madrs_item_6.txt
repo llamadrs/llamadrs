@@ -1,0 +1,41 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Concentration Difficulties
+
+Description:
+Representing difficulties in collecting one's thoughts mounting to incapacitating lack of concentration. Rate according to intensity, frequency, and degree of incapacity produced.
+
+Questions:
+Have you had trouble concentrating or collecting your thoughts in the past week?
+How about at home or at work?
+Can you give me some examples?
+Have you been able to concentrate on reading a newspaper or magazine?
+Do you need to read things over and over again?
+How often has that happened in the past week?
+Has this caused any problems for you?
+Can you give me some examples?
+Has your trouble concentrating been so bad at any time in the past week that it has been difficult to follow a conversation?
+How bad has that been?
+How often has that happened this past week?
+
+Rating Scale:
+0 - No difficulties in concentration.
+1 - Between 0 and 2.
+2 - Occasional difficulties in collecting one's thoughts.
+3 - Between 2 and 4.
+4 - Difficulties in concentrating and sustaining thought which reduces ability to read or hold a conversation.
+5 - Between 4 and 6.
+6 - Unable to read or converse without great difficulty.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's concentration difficulties on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

@@ -1,0 +1,40 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Inner Tension
+
+Description:
+Representing feelings of ill-defined discomfort, edginess, inner turmoil, mental tension mounting to either panic, dread or anguish. Rate according to intensity, frequency, duration and the extent of reassurance called for.
+
+Questions:
+Have you felt tense or edgy in the past week?
+Have you felt anxious or nervous?
+Can you describe what that has been like for you?
+How bad has it been?
+Have you felt panicky?
+What about feeling fearful that something bad is about to happen?
+How hard has it been to control these feelings?
+What has it taken to help you feel calmer?
+Has anything worked to calm you down?
+How much of the time have you felt this way over the past week?
+
+Rating Scale:
+0 - Placid. Only fleeting inner tension.
+1 - Between 0 and 2.
+2 - Occasional feelings of edginess and ill-defined discomfort.
+3 - Between 2 and 4.
+4 - Continuous feelings of inner tension or intermittent panic which the patient can master with some difficulty.
+5 - Between 4 and 6.
+6 - Unrelenting dread or anguish. Overwhelming panic.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's inner tension on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

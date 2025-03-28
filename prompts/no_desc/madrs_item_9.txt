@@ -1,0 +1,123 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Pessimistic Thoughts
+
+Questions:
+Have you been putting yourself down, or feeling that you're a failure in some way, over the past week?
+Have you been blaming yourself for things that you've done, or not done?
+What have your thoughts been?
+How often have you felt that way?
+Have you been feeling guilty about anything in the past week?
+What about feeling as if you have done something bad or sinful?
+What have your thoughts been?
+How often have you felt that way?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's pessimistic thoughts on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+188.  11:49.497 --> 11:55.941 Practitioner: Have you been putting yourself down or something as your failure at all?
+189.  11:56.582 --> 11:58.123 Patient: I feel like the more I learn, the more I can succeed.
+190.  11:59.482 --> 12:01.844 Practitioner: Have you been feeling guilty about anything this past week?
+191.  12:02.264 --> 12:02.464 Patient: Nope.
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198]
+Most Relevant Question: Have you been putting yourself down, or feeling that you're a failure in some way, over the past week?
+
+Transcript:
+...
+240.  17:44.479 --> 17:46.621 Practitioner: In the past week, how have you been feeling about your future?
+241.  17:47.902 --> 17:50.825 Patient: Not good, not good, because I'm not employed at the moment.
+242.  17:51.765 --> 17:58.811 Patient: You know, I'm not employed, and financially it's been a problem for me, you know, so I try not to think about it, but...
+243.  18:01.232 --> 18:10.237 Patient: Employment is key for me in order to get out there, meet people, form friendships at work.
+244.  18:11.097 --> 18:15.959 Patient: But I'm not working at the moment, so it's been a huge problem for me.
+245.  18:17.700 --> 18:18.641 Practitioner: What do you do typically?
+246.  18:19.601 --> 18:20.782 Patient: I used to work in a lab.
+247.  18:20.962 --> 18:22.443 Patient: I used to work in a pathology lab.
+248.  18:24.904 --> 18:25.384 Practitioner: Doing what?
+249.  18:26.865 --> 18:30.387 Patient: Grossing specimens, biological specimens.
+250.  18:40.609 --> 18:42.390 Practitioner: Have you felt discouraged or pessimistic?
+251.  18:44.811 --> 18:46.712 Patient: Discouraged because I can't find a job.
+252.  18:47.352 --> 18:48.132 Patient: Right, yeah.
+253.  18:48.412 --> 18:49.433 Patient: But not pessimistic.
+254.  18:55.935 --> 18:57.676 Practitioner: How often have you felt that way in the past week?
+255.  19:00.557 --> 19:01.157 Patient: Quite often.
+256.  19:02.208 --> 19:03.949 Patient: Right, yeah, quite often.
+257.  19:05.850 --> 19:07.391 Practitioner: Do you think things will ever get better for you?
+258.  19:13.054 --> 19:14.315 Patient: I'm not sure, you know.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258]
+Most Relevant Question: Have you felt discouraged or pessimistic?
+
+Transcript:
+...
+201.  28:04.746 --> 28:23.744 Practitioner: And any times this last week where you were feeling very pessimistic about things, feeling ashamed or guilty?
+202.  28:26.245 --> 28:34.768 Patient: I would say I have a very pessimistic attitude.
+203.  28:34.828 --> 28:46.773 Patient: And I would say I feel very guilty about how... Yeah, I would say I feel pretty guilty.
+204.  28:46.813 --> 28:53.315 Practitioner: And how often would you say that you're feeling that way?
+205.  28:54.501 --> 28:56.162 Patient: I would say it comes and goes.
+206.  28:57.883 --> 29:01.925 Patient: It's not there all the time.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [201, 202, 203, 204, 205, 206, 207]
+Most Relevant Question: And how often would you say that you're feeling that way?
+
+Transcript:
+...
+139.  20:59.533 --> 21:09.556 Practitioner: And any time this last week where you were feeling very pessimistic about things or feeling easily ashamed, putting yourself down a lot?
+140.  21:10.056 --> 21:11.537 Practitioner: How often are you having those kind of thoughts?
+141.  21:18.793 --> 21:28.575 Patient: You know, often, I feel like that's a good descriptor of how I usually describe myself.
+142.  21:28.615 --> 21:36.797 Practitioner: Would you say you haven't had any spots any more than usual?
+143.  21:36.917 --> 21:37.097 Patient: No.
+144.  21:37.137 --> 21:39.598 Patient: Yeah, perhaps a little bit more often.
+145.  21:48.359 --> 21:52.942 Practitioner: Any difficulty with being able to control those kind of thoughts or think about other things?
+146.  21:54.843 --> 22:10.411 Patient: I feel like right now I don't have a great degree of control over my emotions.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [139, 140, 141, 142, 143, 144, 145, 146, 147]
+Most Relevant Question: How often are you having those kind of thoughts?
+
+Transcript:
+...
+296.  21:25.893 --> 21:29.694 Practitioner: Have you been putting yourself down or feeling that you're a failure in some way over the past week?
+297.  21:31.814 --> 21:35.535 Patient: Well, yeah, we talked about this this morning, like guilt.
+298.  21:36.711 --> 21:58.945 Patient: um i did cpr on john for 10 minutes and he died so i always had that guilt yeah even though it wasn't my fault yeah but has that been on your mind a lot this week okay how much is that does that
+299.  21:59.755 --> 22:03.937 Practitioner: Do you feel like it's always kind of on your mind, or do you just remember in, you know, little moments?
+300.  22:04.818 --> 22:06.479 Patient: Just little moments.
+301.  22:12.042 --> 22:15.023 Practitioner: The other question is, have you been feeling guilty about anything in the past week?
+302.  22:15.063 --> 22:20.506 Patient: It sounds like that's... Yeah, that comes and goes.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [296, 297, 298, 299, 300, 301, 302]
+Most Relevant Question: Have you been putting yourself down or feeling that you're a failure in some way over the past week?
+
+Transcript:
+...
+150.  19:21.986 --> 19:26.928 Practitioner: Do you find that you're often feeling guilty about things or putting yourself down a lot?
+151.  19:27.508 --> 19:27.868 Patient: Yeah.
+152.  19:35.157 --> 19:39.639 Practitioner: And when you do have those thoughts, do you feel like you're able to manage them, or are they difficult to control?
+155.  20:02.538 --> 20:04.979 Patient: No, they're just unmanageable.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [150, 151, 152, 155, 156]
+Most Relevant Question: And when you do have those thoughts, do you feel like you're able to manage them, or are they difficult to control?
+

@@ -1,0 +1,183 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Reduced Appetite
+
+Questions:
+How has your appetite been this past week?
+What about compared with your usual appetite?
+Have you been less interested in food?
+How much less?
+Does food taste as good as usual?
+How much less?
+Have you had to force yourself to eat?
+Have other people had to urge you to eat?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's reduced appetite on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+152.  10:38.810 --> 10:39.710 Practitioner: And how's your appetite been?
+153.  10:40.131 --> 10:40.531 Patient: Pretty good.
+154.  10:42.759 --> 10:44.040 Practitioner: Would you say any higher or lower than usual?
+155.  10:44.861 --> 10:45.762 Patient: No, about the same.
+156.  10:47.304 --> 10:48.846 Practitioner: Any times that you were feeling less interested in food?
+157.  10:48.866 --> 10:50.027 Patient: Say that again?
+158.  10:50.308 --> 10:51.909 Practitioner: Any times that you were feeling less interested in food?
+159.  10:52.530 --> 10:52.830 Patient: No.
+160.  10:57.295 --> 11:00.699 Practitioner: And any difficulty with paying attention, concentrating?
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [152, 153, 154, 155, 156, 157, 158, 159, 160]
+Most Relevant Question: How's your appetite been?
+
+Transcript:
+...
+171.  15:07.408 --> 15:19.439 Practitioner: and what's your appetite been like in the last week?
+172. 15:20.440 --> 15:25.222 Patient: the last week has gone better but before i came in last month was terrible i lost a lot of weight i'm six feet tall i was down 127 pounds and that's not good
+173.  15:25.222 --> 15:29.625 Practitioner: Any times where you felt like your appetite was lower than it usually is or feeling less interested in food?
+174.  15:29.645 --> 15:30.225 Patient: Yes, very low.
+175.  15:30.265 --> 15:33.327 Patient: And like I said, I'm just, I don't, like me and my son are the same things.
+176.  15:33.407 --> 15:34.408 Patient: I have no interest.
+177.  15:34.428 --> 15:38.070 Patient: I could have like a steak or something right in front of me and tell you to bite it.
+178.  15:38.090 --> 15:41.332 Patient: I just can't even swallow it because I just have no appetite whatsoever.
+179.  15:41.432 --> 15:42.633 Patient: I don't even know how to explain it.
+180.  15:42.673 --> 15:48.356 Patient: Like nothing tastes good or nothing seems good to me or seems appealing to me.
+181.  15:49.857 --> 15:50.298 Patient: It's weird.
+182.  15:50.618 --> 15:52.559 Practitioner: Was that only last month or also recently?
+183.  15:52.839 --> 16:15.727 Patient: Yeah, no, it's been the last year, so, you know what I mean, I've been doing whatever since the seizures for the last couple years, and my appetite's been messed up, and that's part of the seizures when I'm not eating and sleeping, and I tend to have a seizure, but it's so hard, it's like I know I need to eat, but like I said, nothing, like, it's hard to even explain, like, nothing seems telling me, but I, with the meds that started me here, it's been better the last week.
+184.  16:17.523 --> 16:17.983 Patient: Way better.
+185.  16:18.504 --> 16:22.486 Patient: I actually ate three times a day yesterday, and I haven't done that in the longest time.
+186.  16:26.187 --> 16:28.268 Practitioner: Any times in the last week where you felt like you were forcing yourself to eat?
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186]
+Most Relevant Question: Was that only last month or also recently?
+
+Transcript:
+...
+117.  15:55.975 --> 15:57.776 Practitioner: And how's your appetite been this last week?
+118.  15:58.257 --> 15:58.817 Patient: Moderate.
+119.  15:58.837 --> 16:03.981 Patient: That's usually how it is.
+120.  16:08.979 --> 16:13.082 Practitioner: Any times where you felt like you had really low appetite or like feeling less interested in food?
+121.  16:15.243 --> 16:19.386 Patient: Yeah, I say when I'm anxious or depressed.
+122.  16:20.507 --> 16:21.688 Patient: Usually when that happens.
+123.  16:21.708 --> 16:26.451 Patient: I have a lot on my mind, so then I just don't want to eat.
+124.  16:29.513 --> 16:30.414 Practitioner: And that's happened this last week?
+125.  16:30.974 --> 16:31.155 Patient: Yeah.
+126.  16:31.415 --> 16:31.595 Practitioner: Okay.
+127.  16:39.088 --> 16:41.990 Practitioner: And any times that you had to force yourself to eat or remind yourself to eat?
+128.  16:42.630 --> 16:42.930 Patient: No.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128]
+Most Relevant Question: And how's your appetite been this last week?
+
+Transcript:
+...
+224.  21:48.353 --> 21:49.974 Practitioner: How has your appetite been this past week?
+227.  21:57.437 --> 21:58.897 Practitioner: Have you been less interested in food?
+228.  22:01.078 --> 22:02.739 Patient: Kind of, yeah.
+229.  22:06.940 --> 22:10.142 Patient: Just getting full real fast or not eating very much.
+230.  22:11.622 --> 22:13.043 Patient: I'm eating like two meals a day.
+231.  22:13.063 --> 22:14.864 Practitioner: Okay.
+233.  22:17.366 --> 22:18.807 Practitioner: Does food taste as good as usual?
+234.  22:22.990 --> 22:24.431 Patient: Uh, I guess, yeah.
+235.  22:24.451 --> 22:29.855 Practitioner: Have you had to force yourself to eat?
+236.  22:30.255 --> 22:30.496 Patient: Yeah.
+237.  22:33.858 --> 22:35.059 Practitioner: Forced even for the two meals?
+238.  22:35.499 --> 22:35.719 Patient: Mm-hmm.
+239.  22:35.739 --> 22:35.820 Practitioner: Okay.
+240.  22:36.960 --> 22:38.221 Practitioner: Have other people had to urge you to eat?
+241.  22:40.323 --> 22:42.765 Patient: Um, people have, like, reminded me to eat.
+242.  22:43.105 --> 22:43.245 Practitioner: Okay.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [224, 227, 228, 229, 230, 231, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242]
+Most Relevant Question: How has your appetite been this past week?
+
+Transcript:
+...
+201.  26:15.579 --> 26:18.460 Practitioner: And what would you say your appetite's been like this last week?
+202.  26:21.764 --> 26:23.185 Patient: My appetite's been fine.
+203.  26:24.526 --> 26:25.427 Practitioner: Any more or less than usual?
+204.  26:25.447 --> 26:42.361 Patient: I feel like I've been eating more than I should.
+205.  26:46.905 --> 26:50.768 Practitioner: How about feeling, like, less interested in food or something like that?
+206.  26:53.624 --> 26:56.545 Patient: Sometimes I'm less interested in food.
+207.  26:58.825 --> 27:02.426 Practitioner: Do you find yourself skipping meals or forcing yourself to eat?
+208.  27:03.686 --> 27:06.487 Patient: Yeah, I feel like I'm forcing myself to eat.
+209.  27:14.068 --> 27:22.590 Practitioner: And would you say like forcing yourself to eat in terms of like binge eating or feeling like that you're not hungry so you're forcing yourself to eat because you need to?
+210.  27:32.529 --> 27:54.624 Patient: yeah basically like i don't want to like not eat like i'm like freaked out to like not eat
+211.  27:55.025 --> 27:55.305 Practitioner: Have you noticed any changes in terms of like how food tastes like tasting bland or tasteless?
+212.  27:55.325 --> 27:55.525 Patient: Yeah.
+213.  27:55.545 --> 27:55.745 Patient: Would you say food does taste bland?
+214.  27:55.765 --> 27:55.965 Patient: Yeah.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214]
+Most Relevant Question: And would you say like forcing yourself to eat in terms of like binge eating or feeling like that you're not hungry so you're forcing yourself to eat because you need to?
+
+Transcript:
+...
+246.  27:16.059 --> 27:18.601 Practitioner: And what has your appetite been like in the last week?
+247.  27:18.981 --> 27:19.261 Patient: Low.
+248.  27:19.661 --> 27:19.862 Practitioner: Low?
+249.  27:21.683 --> 27:25.145 Practitioner: Would you say it's, like, usually been low or low at times?
+250.  27:25.165 --> 27:26.546 Patient: It's usually low, yeah.
+251.  27:27.086 --> 27:34.671 Patient: But it's getting lower, and it might be also low because I'm a picky eater, so it doesn't help being in a hospital.
+252.  27:35.051 --> 27:35.332 Practitioner: Mm-hmm.
+253.  27:37.333 --> 27:39.534 Practitioner: Would you say, like, overall you felt less interested in food?
+254.  27:40.495 --> 27:41.736 Patient: Mm, yeah.
+255.  27:41.756 --> 27:41.956 Patient: Yeah.
+256.  27:42.694 --> 27:43.274 Patient: Definitely.
+257.  27:43.354 --> 27:46.476 Patient: Just food more is like a form of fuel than anything else.
+258.  27:50.077 --> 27:52.258 Practitioner: Were there any times that you felt like you were forcing yourself to eat?
+259.  27:53.639 --> 27:53.919 Patient: Mm-hmm.
+260.  27:57.900 --> 28:00.682 Practitioner: And have you noticed any changes in terms of like how food tastes?
+261.  28:00.722 --> 28:03.883 Practitioner: Like tastes bad or bland or strange?
+262.  28:03.903 --> 28:05.023 Patient: Bland, yeah.
+263.  28:06.964 --> 28:08.085 Patient: Or bad, yeah.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263]
+Most Relevant Question: And what has your appetite been like in the last week?
+
+Transcript:
+...
+438.  29:33.157 --> 29:33.477 Practitioner: Low?
+439.  29:33.837 --> 29:34.057 Patient: Yeah.
+441.  29:39.619 --> 29:47.581 Patient: To the point where on Wednesday I realised I hadn't ate since Sunday.
+448.  30:14.710 --> 30:17.111 Patient: Yeah, because I don't feel hungry.
+449.  30:17.351 --> 30:19.953 Patient: I'm less interested in having it because it just seems like a waste of time.
+453.  30:25.976 --> 30:28.677 Patient: It's not an active choice of mine.
+457.  30:37.533 --> 30:39.514 Patient: Like, I'd wake up naturally after three hours.
+460.  30:41.194 --> 30:42.055 Patient: I'm awake.
+465.  30:52.540 --> 30:55.041 Patient: I'm in a hospital, so... Right.
+466.  30:57.723 --> 31:01.685 Patient: I don't have very good grounding for whether it's good or not.
+468.  31:04.775 --> 31:05.095 Patient: Yeah.
+471.  31:07.596 --> 31:08.497 Practitioner: Or have other people?
+472.  31:09.457 --> 31:10.378 Patient: Um, no.
+477.  31:19.522 --> 31:20.303 Patient: And I want to have some more.
+480.  31:25.825 --> 31:27.086 Patient: No is in other people though.
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [438, 439, 441, 448, 449, 453, 457, 460, 465, 466, 468, 471, 472, 477, 480]
+Most Relevant Question: Low?
+

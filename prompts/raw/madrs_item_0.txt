@@ -1,0 +1,10 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the total MADRS score:
+
+Instructions:
+1. Read the provided interview transcript.
+2. Predict the total MADRS score (0-60) based on the overall conversation.
+3. Provide a brief explanation (2-3 sentences) for your predicted score.
+
+Output Format:
+Rating: [0-60]
+Explanation: [2-3 sentences]

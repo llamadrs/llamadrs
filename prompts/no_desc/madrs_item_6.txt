@@ -1,0 +1,156 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Concentration Difficulties
+
+Questions:
+Have you had trouble concentrating or collecting your thoughts in the past week?
+How about at home or at work?
+Can you give me some examples?
+Have you been able to concentrate on reading a newspaper or magazine?
+Do you need to read things over and over again?
+How often has that happened in the past week?
+Has this caused any problems for you?
+Can you give me some examples?
+Has your trouble concentrating been so bad at any time in the past week that it has been difficult to follow a conversation?
+How bad has that been?
+How often has that happened this past week?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's concentration difficulties on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+157.  12:12.460 --> 12:15.962 Practitioner: Any difficulties with collecting your thoughts or concentrating this last week?
+158.  12:17.363 --> 12:19.525 Patient: No, no.
+159.  12:20.326 --> 12:25.650 Patient: I've been reading a book and playing online games, and I've been doing that without difficulty.
+160.  12:25.670 --> 12:25.730 Patient: So...
+161.  12:31.482 --> 12:35.645 Patient: Yeah, I can concentrate about normal.
+162.  12:36.485 --> 12:40.387 Practitioner: Any difficulties when you're having conversations with people or feeling like you're zoning out?
+163.  12:40.948 --> 12:46.491 Patient: Sometimes when I'm having conversations, I can't remember a word or two.
+164.  12:47.312 --> 12:57.137 Patient: But yeah, that's not that different than...
+165.  12:59.153 --> 13:00.734 Patient: Normal for me I think.
+166.  13:01.394 --> 13:02.295 Patient: Yeah.
+167.  13:05.116 --> 13:07.397 Practitioner: Any difficulties with getting things started this last week.
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167]
+Most Relevant Question: Any difficulties with collecting your thoughts or concentrating this last week?
+
+Transcript:
+...
+68.  09:03.682 --> 09:07.425 Practitioner: Any difficulties in the last week with paying attention and concentrating?
+69.  09:08.026 --> 09:08.206 Patient: No.
+70.  09:10.848 --> 09:16.833 Practitioner: Any times that was difficult to focus when like having conversations with other people or trying to read, watching?
+71.  09:16.893 --> 09:17.534 Patient: A little bit, yes.
+72.  09:17.554 --> 09:25.180 Practitioner: How often do you say that happens?
+73.  09:26.501 --> 09:29.523 Patient: I would say like once a week for about 10 minutes.
+74.  09:35.655 --> 09:38.857 Practitioner: So not that often, just like something every now and then?
+75.  09:38.897 --> 09:39.017 Patient: Yeah.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [68, 69, 70, 71, 72, 73, 74, 75]
+Most Relevant Question: So not that often, just like something every now and then?
+
+Transcript:
+...
+149.  17:41.336 --> 17:43.877 Practitioner: Any difficulties with concentration?
+150.  17:43.897 --> 17:44.157 Patient: No.
+151.  17:47.139 --> 17:47.880 Patient: Not in the last week.
+152.  17:48.040 --> 17:49.421 Patient: Not in the last week.
+153.  17:50.982 --> 17:52.023 Patient: Maybe a little before.
+154.  17:52.043 --> 17:56.686 Patient: It was hard to read and stuff.
+155.  17:59.048 --> 18:00.089 Practitioner: When you were experiencing mania?
+156.  18:01.450 --> 18:02.050 Patient: Probably both.
+157.  18:03.611 --> 18:05.813 Patient: Both when I was depressed and having mania.
+158.  18:13.041 --> 18:18.403 Practitioner: Was it just reading that was difficult, or were there other things that you noticed that you were having trouble with?
+159.  18:18.663 --> 18:22.005 Patient: When I was depressed, I was having trouble starting things.
+160.  18:22.345 --> 18:31.409 Patient: I wanted to clean my room, but every time I tried to start cleaning my room, I just got distracted and lazy.
+161.  18:38.772 --> 18:41.194 Practitioner: Would you say that you've been more easily distracted?
+162.  18:41.214 --> 18:41.254 Patient: No.
+163.  18:41.274 --> 18:55.404 Practitioner: Do you think there were any times in the last month where issues with concentration interfered with things or caused problems for you?
+164.  19:00.707 --> 19:00.807 Patient: No.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164]
+Most Relevant Question: Any difficulties with concentration?
+
+
+Transcript:
+...
+154.  13:44.231 --> 13:46.492 Practitioner: Have you had trouble concentrating or collecting your thoughts?
+155.  13:47.472 --> 13:48.072 Patient: Occasionally.
+156.  13:51.114 --> 13:51.734 Practitioner: Tell me about that.
+157.  13:53.410 --> 14:05.599 Patient: I know my concentration's improved since coming here, but it still doesn't feel very I guess like effective and I Especially at night.
+158.  14:05.659 --> 14:20.769 Patient: I have tend to have a lot of racing thoughts Which are I guess difficult to collect 
+159.  14:21.330 --> 14:21.570 Practitioner: Can you read okay?
+160.  14:22.612 --> 14:23.712 Patient: Yeah
+161.  14:23.712 --> 14:25.333 Practitioner: What about focusing on conversations?
+162.  14:26.614 --> 14:36.941 Patient: Conversations I focus on more, maybe just because I'm anxious about slipping up somewhere and then looking, I guess, looking bad, so to say.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [154, 155, 156, 157, 158, 159, 160, 161, 162]
+Most Relevant Question: Have you had trouble concentrating or collecting your thoughts?
+
+Transcript:
+...
+113.  09:32.926 --> 09:35.047 Practitioner: Any trouble concentrating or collecting your thoughts?
+114.  09:36.747 --> 09:37.387 Patient: Some of the time.
+115.  09:38.828 --> 09:39.428 Practitioner: Tell me about that.
+116.  09:40.569 --> 09:46.213 Patient: I just got too much stuff in my head, so sometimes I got to process some stuff.
+117.  09:47.414 --> 09:50.716 Patient: I got hard time processing thoughts.
+118.  09:51.056 --> 09:51.317 Patient: Yeah.
+119.  09:52.517 --> 09:52.798 Practitioner: Okay.
+120.  09:55.299 --> 09:59.903 Practitioner: Do you sometimes lose concentration when you're having conversations?
+121.  10:00.243 --> 10:00.483 Patient: No.
+122.  10:00.503 --> 10:00.943 Practitioner: Okay.
+123.  10:04.366 --> 10:06.427 Practitioner: Is that most conversations every once in a while?
+124.  10:06.447 --> 10:07.428 Patient: Once in a while.
+125.  10:08.559 --> 10:09.880 Patient: My mind just goes wandering.
+126.  10:13.983 --> 10:16.125 Patient: I could be talking to you, but I'm thinking of something else.
+127.  10:16.725 --> 10:17.366 Patient: Somewhere else.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128]
+Most Relevant Question: Is that most conversations every once in a while?
+
+Transcript:
+...
+136.  22:01.104 --> 22:11.969 Practitioner: So while you've been here, how often have you been socializing with other patients, with staff, doing different social activities and stuff like that?
+137.  22:12.229 --> 22:28.676 Patient: I don't like going to groups because I have a hard time concentrating and focusing, especially if there's a clear objective like the dialectical behavior therapy or
+138.  22:31.186 --> 22:39.430 Patient: I tried to go to that group three or four days ago and I had to leave within the first five minutes just because it became so overwhelming.
+139.  22:39.450 --> 22:45.552 Patient: There was a lot of people in there and I couldn't concentrate.
+140.  22:45.572 --> 22:50.894 Patient: I see movement around me at all times and I focus on it.
+141.  22:52.595 --> 22:58.457 Patient: Even if I don't move my head or my eyes, I just notice two people walk past the door.
+142.  23:00.200 --> 23:02.001 Patient: and I'll notice it out the window.
+143.  23:02.021 --> 23:11.184 Patient: I just like, I just, I constantly feel aware.
+144.  23:11.204 --> 23:15.266 Patient: It's like I can't, I can't control it.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [136, 137, 138, 139, 140, 141, 142, 143, 144, 145]
+Most Relevant Question: None
+
+Transcript:
+...
+322.  25:52.745 --> 25:53.125 Practitioner: Have you had trouble concentrating or collecting your thoughts in the past week?
+326.  26:24.349 --> 26:50.800 Patient: yes i can't read it's really frustrating people even brought me like easy readers like the national inquirer and stuff like that i just can't i can't even what this is i can't even watch like instagram like that's how bad it is i can't even look at like a 30 second instagram reel
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [322, 323, 324, 325, 326]
+Most Relevant Question: Have you had trouble concentrating or collecting your thoughts in the past week?

@@ -1,0 +1,194 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Apparent Sadness
+
+Description:
+Representing despondency, gloom and despair. (More than just ordinary transient low spirits) reflected in speech, facial expressions and posture. Rate by depth and inability to brighten up.
+
+Questions:
+In the past week, do you think you have looked sad or depressed to other people?
+Did anyone say you looked sad or down?
+How about when you've looked in the mirror? Did you look gloomy or depressed?
+How sad or depressed do you think you have looked?
+How much of the time over the past week do you think you have looked depressed or down?
+Have you been able to laugh or smile at all during the past week?
+How hard has it been for you to laugh or smile, even if you weren't feeling happy inside?
+
+Rating Scale:
+0 - No sadness.
+1 - Between 0 and 2.
+2 - Looks dispirited but does brighten up without difficulty.
+3 - Between 2 and 4.
+4 - Appears sad and unhappy most of the time.
+5 - Between 4 and 6.
+6 - Looks miserable all the time. Extremely despondent.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's apparent sadness on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+94.  10:50.621 --> 10:55.205 Practitioner: Any times that you might have had the appearance of being sad or depressed to the people around you?
+95.  10:57.026 --> 10:57.887 Patient: I can't tell.
+96.  10:58.487 --> 11:00.569 Patient: I can't see myself from outside.
+97.  11:00.589 --> 11:08.354 Patient: The only mirror I know of is in the bathroom, and I don't get down there that often.
+98.  11:08.774 --> 11:13.357 Practitioner: Has anyone made any comments or anything, like asking if you feel okay and stuff like that?
+99.  11:13.417 --> 11:15.018 Patient: Not excessively, no.
+100.  11:15.098 --> 11:25.425 Patient: I mean, of course they're concerned about anything that they might notice here, but my response usually reassures them fairly quickly.
+91.  10:23.684 --> 10:27.286 Practitioner: And over the last week, have you been feeling sad, down, or depressed at all?
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [94, 95, 96, 97, 98, 99, 100, 91]
+Most Relevant Question: In the past week, do you think you have looked sad or depressed?
+
+Transcript:
+...
+137.  11:44.311 --> 11:47.294 Practitioner: And this last week, have you been feeling sad or depressed at all?
+142.  11:50.478 --> 11:53.361 Practitioner: Were there any times that you might have appeared to be that way?
+143.  11:53.735 --> 11:55.236 Patient: that I might have appeared to be.
+152.  12:17.023 --> 12:17.243 Patient: No.
+153.  12:18.163 --> 12:19.424 Patient: Do you think I look depressed?
+154.  12:19.604 --> 12:20.424 Practitioner: No, I don't.
+155.  12:20.484 --> 12:22.965 Patient: People say I look like I'm glowing.
+156.  12:23.385 --> 12:24.206 Patient: That's what I've heard.
+157.  12:24.226 --> 12:26.227 Patient: I don't know.
+158.  12:26.348 --> 12:30.411 Practitioner: Any times that other people, like, asked if you were feeling okay or things like that?
+159.  12:30.431 --> 12:30.471 Patient: No.
+160.  12:31.332 --> 12:31.912 Practitioner: Okay.
+161.  12:32.252 --> 12:33.674 Practitioner: Like, in a worried way?
+162.  12:33.994 --> 12:34.474 Patient: Right, yeah.
+163.  12:34.534 --> 12:34.714 Patient: No.
+164.  12:34.734 --> 12:35.355 Practitioner: Okay.
+165.  12:35.775 --> 12:39.078 Practitioner: And how about feeling stressed or anxious this last week?
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [137, 142, 143, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165]
+Most Relevant Question: Were there any times that you might have appeared to be that way?
+
+Transcript:
+...
+150.  14:26.722 --> 14:29.163 Practitioner: In the past week, do you think you've looked sad or depressed to other people?
+151.  14:30.224 --> 14:30.924 Patient: Say that one more time.
+153.  14:35.627 --> 14:36.788 Patient: I expect they might, you know?
+155.  14:38.569 --> 14:41.270 Practitioner: How sad or depressed do you think you've looked on like a scale of one to ten?
+156.  14:41.290 --> 14:41.991 Patient: I have no idea.
+158.  14:43.271 --> 14:44.112 Practitioner: Okay.
+159.  14:44.132 --> 14:44.212 Practitioner: Okay.
+161.  14:53.087 --> 14:54.727 Patient: I am sad or depressed, or I look.
+163.  15:01.110 --> 15:01.790 Patient: I have no idea.
+165.  15:09.353 --> 15:09.553 Practitioner: Okay.
+166.  15:12.354 --> 15:15.055 Practitioner: Have you been able to laugh or smile at all in the past week?
+167.  15:15.195 --> 15:15.395 Patient: Yeah.
+169.  15:19.219 --> 15:22.841 Patient: Well, if I hear a good joke, I laugh.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [150, 151, 153, 155, 156, 158, 159, 161, 163, 165, 166, 167, 169]
+Most Relevant Question: In the past week, do you think you've looked sad or depressed to other people?
+
+Transcript:
+...
+33.  06:28.976 --> 06:32.058 Practitioner: And were there any times over the last week where you're feeling sad or depressed?
+34.  06:32.078 --> 06:35.240 Patient: I would say a couple times.
+35.  06:37.119 --> 06:43.269 Patient: But again, it's not really for any reason.
+36.  06:43.609 --> 06:44.951 Patient: It's just there.
+37.  06:46.474 --> 06:50.720 Patient: More just like a general sadness.
+38.  06:57.915 --> 07:06.299 Practitioner: So when you say, like, a couple of times, was there, like, a few times throughout the week where you were feeling down for a little while or times where you were feeling down for the whole day?
+47.  08:02.323 --> 08:07.686 Practitioner: Are there any times in the last week where you thought you might have looked to be sad or depressed to the people around you?
+48.  08:09.667 --> 08:10.747 Patient: Yeah, I'd say so.
+49.  08:11.468 --> 08:20.433 Patient: I heard a couple people mention that I looked upset here and there.
+50.  08:21.253 --> 08:23.855 Patient: But the good thing is it wasn't like all the time.
+51.  08:25.816 --> 08:26.617 Patient: Like previously.
+52.  08:29.338 --> 08:31.179 Patient: Prior to the CT.
+53.  08:34.721 --> 08:38.362 Practitioner: And any difficulty with laughing or smiling this last week?
+54.  08:38.703 --> 08:38.943 Patient: No.
+55.  08:47.887 --> 08:51.549 Practitioner: And personally, do you think that you look sad at all when you look in the mirror?
+56.  08:55.066 --> 08:55.866 Patient: Say sometimes.
+57.  09:03.989 --> 09:07.911 Practitioner: And anything this last week that you've been feeling, uh, like, stressed or anxious about?
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [33, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]
+Most Relevant Question: In the past week, do you think you've looked sad or depressed to other people?
+
+Transcript:
+...
+54.  06:54.386 --> 06:57.066 Practitioner: In the past week, do you think you've looked sad or depressed to other people?
+55.  06:57.226 --> 06:57.446 Patient: Yes.
+56.  06:58.787 --> 07:00.247 Practitioner: How sad or depressed do you think you've looked?
+57.  07:04.982 --> 07:07.743 Patient: I can't read faces, mine or others.
+58.  07:08.043 --> 07:08.943 Patient: I have no idea.
+59.  07:14.366 --> 07:16.466 Practitioner: How much of the time do you think you've looked that way?
+60.  07:18.867 --> 07:19.328 Patient: Majority.
+61.  07:19.348 --> 07:24.730 Practitioner: Have you been able to laugh or smile at all?
+62.  07:25.010 --> 07:25.210 Patient: Yeah.
+63.  07:26.270 --> 07:28.551 Practitioner: How hard has that been, even if you weren't feeling happy?
+64.  07:32.080 --> 07:36.842 Patient: It's only been when I've received visitors.
+67.  07:49.948 --> 07:50.168 Patient: Yes.
+68.  07:50.548 --> 07:50.788 Practitioner: Okay.
+69.  07:52.389 --> 07:53.129 Practitioner: How bad has that been?
+70.  07:54.350 --> 07:54.630 Patient: Sorry?
+71.  07:55.150 --> 07:56.111 Practitioner: How bad has that been?
+72.  07:57.611 --> 07:58.152 Patient: All the way?
+73.  07:58.592 --> 07:59.212 Patient: All the way bad.
+74.  07:59.712 --> 08:00.312 Practitioner: All the way bad?
+75.  08:01.153 --> 08:01.313 Patient: Yeah.
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 67, 68, 69, 70, 71, 72, 73, 74, 75]
+Most Relevant Question: In the past week, do you think you've looked sad or depressed to other people?
+
+Transcript:
+...
+9.  03:44.920 --> 03:52.503 Practitioner: But first of all, I'd really like you to tell me about something about yourself and your background.
+10.  03:54.744 --> 04:03.827 Patient: I'm not really sure my background as far as the last seven days or just in general.
+11.  04:04.811 --> 04:05.891 Patient: That's more in general.
+12.  04:07.092 --> 04:10.593 Patient: I don't know really what to say about that.
+13.  04:10.633 --> 04:16.935 Patient: I guess that at least for the last seven, eight years, I've been living on my own.
+14.  04:18.795 --> 04:28.798 Patient: I was doing sort of well prior to COVID, but after that, I started to get isolated and depressed and wasn't able to hold a job.
+15.  04:30.971 --> 04:38.058 Patient: I've been addicted to drugs for a long time and suffered from depression for a long time.
+185.  14:55.957 --> 14:56.697 Practitioner: In the past week, do you think you've looked sad or depressed to other people?
+186.  14:56.877 --> 14:57.718 Patient: I would say so, yeah.
+187.  14:58.058 --> 14:58.338 Practitioner: Yeah?
+191.  15:05.697 --> 15:12.459 Patient: that they'd be pretty sure that I'm depressed, just based on the way that I'm holding myself.
+192.  15:15.299 --> 15:28.963 Patient: I try, I don't like what I see really, but I also think that I, I don't know, I know that I used to like who I was a lot more when I look in the mirror, and now I'm just like, I can barely do it, you know?
+193.  15:32.566 --> 15:32.826 Patient: Yeah.
+195.  16:04.265 --> 16:06.907 Patient: and I don't know what to do about it, and I don't know how to change it.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [9, 10, 11, 12, 13, 14, 15, 186, 187, 191, 192, 193, 195]
+Most Relevant Question: In the past week, do you think you've looked sad or depressed to other people?
+
+Transcript:
+...
+108.  10:30.902 --> 10:32.943 Practitioner: In the past week, do you think you've looked sad or depressed?
+109.  10:33.424 --> 10:33.664 Patient: Yeah.
+110.  10:33.684 --> 10:34.404 Practitioner: Okay.
+111.  10:35.004 --> 10:37.486 Practitioner: On a scale of 1 to 10, how sad or depressed do you think you've looked?
+112.  10:37.506 --> 10:39.287 Patient: I'd say a 10.
+113.  10:41.688 --> 10:43.369 Practitioner: How much of the time do you think you've looked that way?
+114.  10:44.310 --> 10:44.790 Patient: What do you mean?
+115.  10:46.391 --> 10:50.013 Practitioner: How much of the time do you think you've looked sad or depressed to other people in the past week?
+116.  10:50.113 --> 10:51.894 Patient: Probably constantly.
+117.  10:51.914 --> 10:52.875 Practitioner: Okay.
+118.  10:54.416 --> 10:56.037 Practitioner: Have you been able to laugh or smile at all?
+119.  11:02.244 --> 11:03.964 Practitioner: Have you been feeling sad or unhappy this week?
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119]
+Most Relevant Question: In the past week, do you think you've looked sad or depressed?

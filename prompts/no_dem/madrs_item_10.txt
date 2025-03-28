@@ -1,0 +1,43 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Suicidal Thoughts
+
+Description:
+Representing the feeling that life is not worth living, that a natural death would be welcome, suicidal thoughts, and preparation for suicide. Suicidal attempts should not in themselves influence this rating.
+
+Questions:
+This past week, have you felt like life isn't worth living?
+Tell me about that.
+What about feeling as if you're tired of living?
+This week, have you thought that you would be better off dead?
+Tell me about that.
+Have you had thoughts of hurting or even killing yourself this past week?
+What have you thought about?
+How often have you had these thoughts?
+How long have they lasted?
+Have you actually made plans?
+What are these plans?
+Have you made any preparations to carry out these plans?
+Have you told anyone about it?
+
+Rating Scale:
+0 - Enjoys life or takes it as it comes.
+1 - Between 0 and 2.
+2 - Weary of life. Only fleeting suicidal thoughts.
+3 - Between 2 and 4.
+4 - Probably better off dead. Suicidal thoughts are common, and suicide is considered as a possible solution, but without specific plans or intention.
+5 - Between 4 and 6.
+6 - Explicit plans for suicide when there is an opportunity. Active preparations for suicide.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's suicidal thoughts on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

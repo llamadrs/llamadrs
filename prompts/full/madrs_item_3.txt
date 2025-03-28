@@ -1,0 +1,166 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Inner Tension
+
+Description:
+Representing feelings of ill-defined discomfort, edginess, inner turmoil, mental tension mounting to either panic, dread or anguish. Rate according to intensity, frequency, duration and the extent of reassurance called for.
+
+Questions:
+Have you felt tense or edgy in the past week?
+Have you felt anxious or nervous?
+Can you describe what that has been like for you?
+How bad has it been?
+Have you felt panicky?
+What about feeling fearful that something bad is about to happen?
+How hard has it been to control these feelings?
+What has it taken to help you feel calmer?
+Has anything worked to calm you down?
+How much of the time have you felt this way over the past week?
+
+Rating Scale:
+0 - Placid. Only fleeting inner tension.
+1 - Between 0 and 2.
+2 - Occasional feelings of edginess and ill-defined discomfort.
+3 - Between 2 and 4.
+4 - Continuous feelings of inner tension or intermittent panic which the patient can master with some difficulty.
+5 - Between 4 and 6.
+6 - Unrelenting dread or anguish. Overwhelming panic.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's inner tension on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+189.  13:36.602 --> 13:39.024 Practitioner: And any stress or anxiety that you've been dealing with over the last week?
+190.  13:40.902 --> 13:42.664 Patient: Yeah, I mean, I don't like being here.
+191.  13:42.684 --> 13:45.906 Patient: I'm really trying to get home, but nothing too bad.
+192.  13:45.926 --> 13:47.467 Patient: I've been feeling pretty chill.
+193.  13:47.607 --> 13:55.852 Patient: I mean, honestly, getting my phone back has been helpful, but it reminds me of the outside world and the four weeks have gone by.
+196.  14:04.398 --> 14:09.641 Patient: But just a little bit of anxiety in terms of just, like, I want to get out of here and get back to my life, like...
+197.  14:10.949 --> 14:12.050 Patient: But nothing too bad.
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [189, 190, 191, 192, 193, 196, 197]
+Most Relevant Question: And any stress or anxiety that you've been dealing with over the last week?
+
+Transcript:
+...
+70.  09:34.117 --> 09:37.839 Practitioner: Any stress or anxiety you've been dealing with?
+71.  09:37.859 --> 09:38.859 Patient: There's been a little bit.
+72.  09:39.520 --> 09:40.940 Patient: There's been a little bit of stress.
+73.  09:41.980 --> 09:44.281 Patient: I think there's some that comes with discharge.
+74.  09:44.301 --> 09:50.004 Patient: You know, trying to figure everything out for the outside, getting everything back together.
+75.  09:57.188 --> 10:00.571 Practitioner: Any times that you were feeling stressed about other things outside of, like, you know, what we had?
+76.  10:03.693 --> 10:03.813 Patient: No.
+77.  10:03.853 --> 10:13.581 Practitioner: And how often would you say that you would, you know, feel stressed about that?
+78.  10:14.401 --> 10:14.942 Patient: Not too much.
+79.  10:14.982 --> 10:17.103 Patient: Maybe once a day, if that.
+80.  10:18.765 --> 10:23.648 Patient: Usually when it gets brought up, I'll feel a little bit of a...
+81.  10:25.081 --> 10:33.246 Patient: anxiety and stress come towards it, but I know how to manage it fairly well now.
+82.  10:37.669 --> 10:40.330 Practitioner: And any times in the last week where you felt like something bad was gonna happen?
+83.  10:41.031 --> 10:41.131 Patient: No.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83]
+Most Relevant Question: Any stress or anxiety you've been dealing with?
+
+Transcript:
+...
+94.  09:37.249 --> 09:41.071 Practitioner: Any time this last week that you had a feeling of dread or felt like something terrible was going to happen?
+95.  09:41.091 --> 09:42.151 Patient: No.
+96.  09:48.034 --> 09:51.276 Practitioner: Any physical anxiety, feeling really tense, heart racing?
+97.  09:52.628 --> 10:05.916 Patient: Yeah, my heart rate, like, average is, like, 110 when, like, I'm sitting down and they're testing my heart rate.
+98.  10:06.957 --> 10:09.819 Patient: Yeah, I've been shaking my leg like a dog.
+99.  10:13.281 --> 10:17.204 Patient: Just very, very much and aggressively.
+100.  10:20.330 --> 10:25.932 Practitioner: How do you feel like you've been doing with controlling stress this last week?
+101.  10:28.393 --> 10:30.534 Patient: I think I've actually been doing a pretty good job.
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [94, 95, 96, 97, 98, 99, 100, 101]
+Most Relevant Question: Any time this last week that you had a feeling of dread or felt like something terrible was going to happen?
+
+Transcript:
+...
+137.  16:11.587 --> 16:14.509 Practitioner: Tense or edgy in the past week?
+138.  16:14.729 --> 16:15.049 Patient: Yeah.
+139.  16:15.449 --> 16:17.170 Practitioner: Like anxious, nervous?
+140.  16:18.211 --> 16:18.751 Patient: Anxious.
+141.  16:18.771 --> 16:19.912 Practitioner: Okay.
+142.  16:19.932 --> 16:20.792 Practitioner: How bad has that been?
+143.  16:23.334 --> 16:26.375 Patient: Not as bad as the depression, I guess.
+144.  16:26.716 --> 16:26.976 Practitioner: Okay.
+145.  16:27.036 --> 16:33.139 Practitioner: On a scale of one to ten?
+146.  16:33.159 --> 16:33.780 Patient: Like a six.
+147.  16:40.123 --> 16:43.604 Practitioner: Does it vary at all throughout the day, throughout the week?
+148.  16:44.084 --> 16:46.585 Practitioner: Does it ever go away completely, anxiety?
+149.  16:49.026 --> 16:51.347 Patient: There's times where it goes away.
+150.  16:57.529 --> 16:58.590 Practitioner: Have you felt panicky?
+151.  17:01.371 --> 17:02.891 Patient: Not within the last week.
+152.  17:06.833 --> 17:09.594 Practitioner: How hard has it been to control feelings of anxiety?
+153.  17:14.042 --> 17:21.468 Patient: Challenging, but not, I don't know, not unmanageable, I guess.
+154.  17:31.157 --> 17:33.519 Practitioner: How much of the time have you felt anxious?
+155.  17:41.806 --> 17:44.047 Patient: I don't know, less than half the time.
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155]
+Most Relevant Question: Tense or edgy in the past week?
+
+Transcript:
+...
+153.  12:03.454 --> 12:05.116 Practitioner: And how about feeling stressed or anxious?
+154.  12:05.496 --> 12:05.696 Patient: A lot.
+155.  12:05.776 --> 12:11.661 Practitioner: How do you feel like you've been doing with handling it?
+158.  12:14.964 --> 12:22.311 Patient: The doctors are doing pretty good managing it, but sometimes the medicine's not enough.
+159.  12:26.203 --> 12:28.524 Patient: Because I get a bad case of anxiety all the time.
+160.  12:29.345 --> 12:30.366 Patient: I just admit it.
+163.  12:38.991 --> 12:40.712 Practitioner: Were there any times that you felt like you couldn't control it?
+164.  12:41.413 --> 12:43.654 Patient: Oh yeah.
+165.  12:43.694 --> 12:44.475 Patient: Definitely.
+166.  12:48.977 --> 12:51.519 Practitioner: And how about noticing physical things?
+168.  12:54.581 --> 12:54.701 Patient: Yeah.
+169.  12:59.204 --> 13:01.284 Practitioner: Is that only when it gets really bad, or does that happen often?
+170.  13:01.304 --> 13:03.865 Patient: When it gets really bad.
+171.  13:03.885 --> 13:12.047 Practitioner: And how often this last week would you say that it got really bad?
+172.  13:12.067 --> 13:14.647 Patient: Every day.
+173.  13:18.328 --> 13:23.409 Practitioner: And any time this last week where you had a feeling of dread or felt like something really terrible was about to happen?
+174.  13:28.772 --> 13:30.914 Practitioner: And how has sleep been for you this last week?
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [153, 154, 155, 158, 159, 160, 163, 164, 165, 166, 168, 169, 170, 171, 172, 173, 174]
+Most Relevant Question: And how about feeling stressed or anxious?
+
+Transcript:
+...
+7.  03:38.817 --> 03:43.900 Practitioner: Anything in particular that happened?
+8.  03:45.061 --> 03:51.765 Patient: My anxiety has been really high and it's been triggered by a staff member and a patient.
+9.  03:57.543 --> 03:59.925 Practitioner: Did you have any like bad interactions with either of them?
+80.  11:05.143 --> 11:10.326 Practitioner: Mostly just triggered from those interactions with other people or has it been like a general feeling of anxiety as well?
+81.  11:11.006 --> 11:12.647 Patient: General feeling of anxiety.
+82.  11:24.133 --> 11:28.295 Practitioner: And how often would you say that you are feeling some level of anxiety?
+86.  11:55.188 --> 12:07.472 Patient: I think if I'm distracted by something else, it'll briefly go down, but unless I'm actively doing something, I'm shaking or my heart's racing.
+91.  12:43.012 --> 12:43.312 Patient: Yeah.
+92.  12:45.713 --> 12:46.313 Practitioner: Anything in particular?
+95.  13:01.261 --> 13:09.282 Practitioner: And aside from trying to distract yourself or do something else, are there any other things that help you calm down when you're feeling anxious?
+96.  13:11.883 --> 13:17.704 Patient: Usually sensory objects, hot or cold packs.
+97.  13:21.725 --> 13:27.626 Patient: Those are the non-self-injurious ways of coping.
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [7, 8, 9, 80, 81, 82, 86, 91, 92, 95, 96, 97]
+Most Relevant Question: And how often would you say that you are feeling some level of anxiety?
+

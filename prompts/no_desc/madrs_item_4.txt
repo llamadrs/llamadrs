@@ -1,0 +1,186 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Reduced Sleep
+
+Questions:
+How has your sleeping been in the past week?
+How many hours have you been sleeping, compared with usual?
+Have you had trouble falling asleep?
+How long has it been taking you to fall asleep this past week?
+Have you been able to stay asleep through the night?
+Have you been waking up at all in the middle of the night?
+How long does it take you to go back to sleep?
+Has your sleeping been restless or disturbed?
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's reduced sleep on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
+Examples:
+Transcript:
+...
+124.  10:15.762 --> 10:16.543 Practitioner: How's your sleep been?
+125.  10:16.903 --> 10:17.083 Patient: Good.
+126.  10:17.463 --> 10:20.426 Patient: But I take medication for sleep, so that's why I sleep well.
+127.  10:20.987 --> 10:22.428 Practitioner: How many hours are you getting each night?
+128.  10:22.648 --> 10:22.988 Patient: A lot.
+129.  10:23.168 --> 10:23.389 Patient: Ten.
+130.  10:26.111 --> 10:27.192 Practitioner: Any trouble falling asleep?
+131.  10:27.692 --> 10:27.833 Patient: No.
+132.  10:29.554 --> 10:30.575 Practitioner: Any trouble staying asleep?
+133.  10:30.935 --> 10:31.035 Patient: Mm-mm.
+134.  10:33.618 --> 10:35.219 Practitioner: Has your sleeping been restless or disturbed?
+135.  10:36.639 --> 10:39.200 Patient: Just because of the unit, because it's loud.
+136.  10:40.000 --> 10:47.142 Patient: And I choose to stay in my bed anyway and not come out when I wake up because it's craziness out there.
+137.  10:48.563 --> 10:49.683 Patient: So I just stay in my room.
+...
+Rating: 0
+Explanation:[2-3 sentences] 
+Key Utterances: [124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137]
+Most Relevant Question: How many hours are you getting each night?
+
+Transcript:
+...
+96.  07:50.993 --> 07:52.774 Practitioner: How's your sleep?
+97.  07:53.474 --> 07:53.654 Patient: Good.
+98.  07:54.334 --> 07:55.215 Practitioner: How many hours are you getting?
+99.  07:56.195 --> 07:57.856 Patient: Like, ten.
+100.  07:59.877 --> 08:00.837 Practitioner: Any trouble falling asleep?
+101.  08:01.577 --> 08:02.818 Patient: Not really, no.
+102.  08:03.318 --> 08:03.999 Practitioner: Even slight?
+103.  08:05.119 --> 08:09.221 Patient: Like, I did the other night, but other than that, it's been fine.
+104.  08:12.702 --> 08:13.943 Practitioner: Any trouble staying asleep?
+105.  08:14.343 --> 08:14.523 Patient: No.
+106.  08:16.544 --> 08:18.345 Practitioner: And has your sleep been restless or disturbed?
+107.  08:18.705 --> 08:19.285 Patient: Nope.
+138.  09:45.593 --> 09:47.674 Practitioner: And you said you're getting 10 hours of sleep?
+139.  09:47.955 --> 09:48.575 Patient: Yeah.
+140.  09:49.315 --> 09:52.737 Practitioner: Sorry, I imagine you don't feel that you need less sleep than usual to feel rested?
+141.  09:52.777 --> 09:53.018 Patient: No.
+...
+Rating: 1
+Explanation:[2-3 sentences] 
+Key Utterances: [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 138, 139, 140, 141]
+Most Relevant Question: How many hours are you getting each night?
+
+Transcript:
+...
+67.  10:08.323 --> 10:10.084 Practitioner: How has sleep been over the last week?
+68.  10:13.467 --> 10:13.707 Patient: Good.
+69.  10:13.727 --> 10:24.074 Patient: There's some tossing and turning, but they're continuing to work on my sleeping meds, so I can't complain.
+70.  10:29.773 --> 10:32.234 Practitioner: Do you feel like you're getting any more or less sleep than usual?
+71.  10:32.254 --> 10:35.676 Patient: No, I'd say about the same.
+72.  10:44.101 --> 10:48.063 Practitioner: And aside from tossing and turning, any difficulty like falling asleep, staying asleep?
+73.  10:49.704 --> 10:53.046 Patient: Yeah, I would say staying asleep sometimes.
+74.  10:54.327 --> 10:57.669 Patient: It just depends on what's going on upstairs in my head.
+75.  11:05.181 --> 11:07.323 Practitioner: And what has your appetite been like this last week?
+...
+Rating: 2
+Explanation:[2-3 sentences] 
+Key Utterances: [67, 68, 69, 70, 71, 72, 73, 74, 75]
+Most Relevant Question: Do you feel like you're getting any more or less sleep than usual?
+
+Transcript:
+...
+139.  12:02.315 --> 12:03.275 Practitioner: How has your sleep been?
+140.  12:04.756 --> 12:05.476 Patient: Sleep's been good.
+141.  12:05.496 --> 12:06.237 Practitioner: Okay.
+142.  12:07.057 --> 12:07.757 Practitioner: How many hours?
+143.  12:10.899 --> 12:11.819 Patient: Over, over.
+144.  12:13.260 --> 12:19.702 Patient: It's hard for me to gauge it because I don't look at the clock too much, but I know I'm getting over six, seven hours.
+145.  12:19.722 --> 12:20.243 Practitioner: Okay.
+146.  12:28.626 --> 12:29.746 Practitioner: Any trouble falling asleep?
+147.  12:30.767 --> 12:30.867 Patient: No.
+148.  12:33.038 --> 12:34.159 Practitioner: Any trouble staying asleep?
+149.  12:34.739 --> 12:34.919 Patient: No.
+150.  12:35.679 --> 12:37.120 Practitioner: Sleeping restless or disturbed?
+151.  12:37.640 --> 12:37.680 Patient: No.
+152.  12:37.700 --> 12:41.602 Practitioner: Okay, and what would you consider a normal healthy night's sleep for you?
+153.  12:41.642 --> 12:42.182 Practitioner: How many hours?
+154.  12:43.222 --> 12:50.005 Patient: Going to sleep at 10 o'clock at night, waking up at 6 o'clock in the morning.
+155.  12:50.025 --> 12:50.526 Practitioner: Okay.
+156.  12:57.669 --> 12:58.749 Practitioner: How's your appetite been?
+...
+Rating: 3
+Explanation:[2-3 sentences] 
+Key Utterances: [139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156]
+Most Relevant Question: How many hours?
+
+Transcript:
+...
+252.  29:32.307 --> 29:33.668 Practitioner: And how have you been sleeping this last week?
+253.  29:40.766 --> 29:42.107 Patient: Last night was subpar.
+254.  29:43.267 --> 29:47.428 Patient: Every night prior to last night was a shit show, sleep-wise.
+255.  29:49.469 --> 29:57.272 Patient: Nightmares, broken sleep, inability to sleep, difficulty falling asleep, waking up too early.
+256.  30:01.574 --> 30:03.914 Practitioner: Do you think you're also getting less sleep as well as a result of all that?
+257.  30:04.255 --> 30:04.715 Patient: Absolutely.
+258.  30:05.815 --> 30:08.236 Patient: I've been very sleep-deprived for a very long time now.
+259.  30:09.505 --> 30:11.545 Patient: Withdrawal was preventing me from sleeping.
+260.  30:15.706 --> 30:18.167 Patient: And that's withdrawal from olanzapine and cannabis.
+261.  30:25.169 --> 30:30.770 Practitioner: So what would you say is an average night's sleep for you, generally speaking?
+262.  30:37.622 --> 30:39.222 Patient: I'm fine with seven hours.
+263.  30:40.463 --> 30:43.803 Patient: Eight is usually a bad number for me for some reason.
+264.  30:43.884 --> 30:46.944 Patient: It just hits at the wrong kind of my circadian rhythm.
+265.  30:47.484 --> 30:51.785 Patient: If I'm really tired, it's nice to get nine hours.
+266.  30:53.346 --> 30:59.327 Patient: And I've lived most of my life sleep deprived, so I really like those nine hour nights.
+267.  31:02.028 --> 31:06.649 Patient: Sometimes in my life I would, in my history, I've had
+268.  31:08.385 --> 31:36.211 Patient: extreme oversleep problems sleeping 10 hours sleeping 12 hours just not wanting to get up under any circumstance how many hours of sleep would you say that you were getting uh this last week on average on average maybe four that's that's that's a fudge that's estimate i really don't know that's okay it's probably not that bad though actually
+269.  31:39.202 --> 31:43.545 Practitioner: And how's your appetite then?
+...
+Rating: 4
+Explanation:[2-3 sentences] 
+Key Utterances: [252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269]
+Most Relevant Question: And how have you been sleeping this last week?
+
+Transcript:
+...
+134.  12:54.127 --> 12:55.488 Practitioner: And have you been sleeping in the last week?
+135.  12:56.068 --> 12:56.669 Patient: Not good.
+136.  12:56.889 --> 12:57.249 Patient: Not good?
+137.  12:57.389 --> 12:57.629 Patient: No.
+138.  12:59.230 --> 13:00.031 Practitioner: More or less than usual?
+139.  13:00.411 --> 13:00.611 Patient: Less.
+140.  13:02.110 --> 13:04.252 Patient: Well, some days less, some days more.
+141.  13:09.456 --> 13:12.959 Practitioner: So how much difference would you say usually?
+142.  13:12.979 --> 13:30.073 Patient: Like some nights I was sleeping like a good probably like a good like 15 hours and the other nights
+143.  13:31.246 --> 13:34.027 Patient: I'd say it was probably closer to six.
+144.  13:38.149 --> 13:40.650 Practitioner: And is like eight or nine usual for you?
+145.  13:40.670 --> 13:44.091 Patient: I'd say around 10 to 12 as usual.
+146.  13:44.131 --> 13:45.572 Practitioner: 10 to 12 as usual, okay.
+147.  13:54.016 --> 13:58.017 Practitioner: And were there any nights where you did get 10 to 12 or was it always kind of like one or the other?
+148.  13:58.037 --> 13:59.598 Patient: It was always one or the other.
+149.  14:05.015 --> 14:06.896 Practitioner: And any difficulty with falling asleep, staying asleep?
+150.  14:07.636 --> 14:07.936 Patient: Both.
+151.  14:15.020 --> 14:16.480 Practitioner: And how's your appetite been in the last week?
+...
+Rating: 5
+Explanation:[2-3 sentences] 
+Key Utterances: [134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151]
+Most Relevant Question: And have you been sleeping in the last week?
+
+Transcript:
+...
+358.  21:29.875 --> 21:30.855 Practitioner: How is your sleeping been?
+359.  21:30.875 --> 21:32.396 Patient: I ain't been getting no sleep.
+360.  21:32.976 --> 21:33.937 Patient: I got sleep apnea.
+361.  21:35.238 --> 21:37.959 Practitioner: So, zero hours of sleep.
+362.  21:38.219 --> 21:38.519 Patient: Yeah.
+399.  23:26.222 --> 23:26.582 Patient: Yeah.
+400.  23:26.883 --> 23:27.203 Practitioner: Okay.
+401.  23:27.463 --> 23:29.445 Practitioner: So you just can't fall asleep?
+402.  23:29.465 --> 23:30.045 Patient: I can't fall asleep.
+403.  23:30.105 --> 23:31.326 Patient: I toss and turn all night.
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [358, 359, 360, 361, 362, 399, 400, 401, 402, 403]
+Most Relevant Question: How is your sleeping been?
+

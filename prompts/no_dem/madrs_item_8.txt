@@ -1,0 +1,42 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Inability to Feel
+
+Description:
+Representing the subjective experience of reduced interest in the surroundings, or activities that normally give pleasure. The ability to react with adequate emotion to circumstances or people is reduced.
+
+Questions:
+Have you been less interested in things around you, or in activities you used to enjoy?
+What things?
+How bad has that been?
+How much less interested in (those things) are you now compared with before?
+Have you been less able to enjoy the things you usually enjoy?
+Has there been any change in your ability to feel emotions?
+Do you feel things less intensely than you used to, things like anger, grief, pleasure?
+Can you tell me more about that?
+Are you able to feel any emotions at all?
+How do you feel towards your family and friends?
+Is that different from usual?
+Do you feel less than you used to towards them?
+
+Rating Scale:
+0 - Normal interest in the surroundings and in other people.
+1 - Between 0 and 2.
+2 - Reduced ability to enjoy usual interests.
+3 - Between 2 and 4.
+4 - Loss of interest in the surroundings. Loss of feelings for friends and acquaintances.
+5 - Between 4 and 6.
+6 - The experience of being emotionally paralysed, inability to feel anger, grief or pleasure, and a complete or even painful failure to feel for close relatives and friends.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's inability to feel on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+

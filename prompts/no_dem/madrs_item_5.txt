@@ -1,0 +1,38 @@
+Task: Analyze a diarized transcript of a psychiatric session where the Montgomery-Åsberg Depression Rating Scale (MADRS) questionnaire is being administered. Predict the rating (0-6) that the practitioner would likely give for the specified MADRS item based on the patient's responses and the conversation. Remember that the rating is for the last week, not based on the patient's history or general condition. Focus on the questions that are directly related to the MADRS item and the patient's answers. Give priority to their answers to the question that seems to be the most relevant to the MADRS item using the provided question examples.
+MADRS Item: Reduced Appetite
+
+Description:
+Representing the feeling of a loss of appetite compared with when well. Rate by loss of desire for food or the need to force oneself to eat.
+
+Questions:
+How has your appetite been this past week?
+What about compared with your usual appetite?
+Have you been less interested in food?
+How much less?
+Does food taste as good as usual?
+How much less?
+Have you had to force yourself to eat?
+Have other people had to urge you to eat?
+
+Rating Scale:
+0 - Normal or increased appetite.
+1 - Between 0 and 2.
+2 - Slightly reduced appetite.
+3 - Between 2 and 4.
+4 - No appetite. Food is tasteless.
+5 - Between 4 and 6.
+6 - Needs persuasion to eat at all.
+
+
+Instructions:
+1. Read the provided interview transcript.
+2. Rate the interviewee's reduced appetite on a scale of 0-6.
+3. Provide a brief explanation (2-3 sentences) for your rating.
+4. List 2-3 key utterances from the conversation supporting your assessment.
+
+Output Format:
+Rating: [0/1/2/3/4/5/6]
+Explanation: [2-3 sentences]
+Key Utterances: [list of lines from the transcript]
+Most Relevant Question: [question that seems most relevant to the MADRS item]
+
