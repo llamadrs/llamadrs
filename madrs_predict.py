@@ -66,7 +66,7 @@ def diarize_texts(tokenizer, vtt_transcriptions, output_files, labels, model_id,
     max_length = 0
     max_prompt_length = 0
     if prompt_type == "":
-        prompt_dir = "complete"
+        prompt_dir = "full"
     else:
         prompt_dir = f"{prompt_type}"
     prompt_file = f"./prompts/{prompt_dir}/madrs_item_{madrs_idx}.txt"
