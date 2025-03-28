@@ -7,6 +7,6 @@ The CAMI dataset is a unique resource that includes real patient-clinician inter
 
 - Project: [CAMI dataset](https://bakerlab.mclean.harvard.edu/context-adaptive-multimodal-informatics-for-psychiatric-discharge-planning/). 
 - NIH RePORTER link: [NIH RePORTER](https://reporter.nih.gov/search/a9XdMHOQ20-T4NAcPOFU_Q/project-details/10167040).
-- The Poster is in the [./CAMI_Poster.pdf](https://github.com/llamadrs/llamadrs/CAMI_poster.pdf) file.
+- The Poster is in the [./CAMI_Poster.pdf](https://github.com/llamadrs/llamadrs/CAMI_Poster.pdf) file.
 
 ## Code:
