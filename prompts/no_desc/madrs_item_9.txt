@@ -18,11 +18,13 @@ Instructions:
 3. Provide a brief explanation (2-3 sentences) for your rating.
 4. List 2-3 key utterances from the conversation supporting your assessment.
 
-Output Format:
-Rating: [0/1/2/3/4/5/6]
-Explanation: [2-3 sentences]
-Key Utterances: [list of lines from the transcript]
-Most Relevant Question: [question that seems most relevant to the MADRS item]
+Output Format (json):
+{
+  "rating": 0/1/2/3/4/5/6,
+  "explanation": "2-3 sentences",
+  "key_utterances": [list of line numbers from the transcript],
+  "most_relevant_question": "question that seems most relevant to the MADRS item"
+}
 
 Examples:
 Transcript:
@@ -121,3 +123,48 @@ Explanation:[2-3 sentences]
 Key Utterances: [150, 151, 152, 155, 156]
 Most Relevant Question: And when you do have those thoughts, do you feel like you're able to manage them, or are they difficult to control?
 
+Transcript:
+...
+531. 00:39:42.248 --> 00:39:47.048 Practitioner: Have you been putting yourself down or feeling that you're a failure in some way over the past week?
+532. 00:39:50.248 --> 00:39:52.088 Patient: Yeah, yeah, I would think so, yeah.
+533. 00:39:52.728 --> 00:39:53.048 Practitioner: Okay.
+534. 00:39:54.568 --> 00:39:56.568 Practitioner: What have your thoughts been about that?
+535. 00:39:57.528 --> 00:39:58.489 Patient: It's terrible.
+536. 00:39:58.809 --> 00:40:01.048 Patient: I mean, I don't want to feel that way,
+537. 00:40:01.608 --> 00:40:03.208 Patient: But I'm a realist.
+538. 00:40:04.146 --> 00:40:05.088 Patient: Keep a real of myself.
+539. 00:40:07.128 --> 00:40:07.688 Patient: You know?
+540. 00:40:08.809 --> 00:40:12.809 Patient: I can no longer use the excuse that I'm a man just because I have a penis.
+541. 00:40:13.128 --> 00:40:13.170 Patient: Like,
+542. 00:40:13.170 --> 00:40:14.550 Patient: There's more to it.
+543. 00:40:15.289 --> 00:40:18.168 Patient: There's more to social values, values,
+544. 00:40:18.168 --> 00:40:28.597 Patient: More to success being an ambiguous term other than just, i don't know, grasping at straws here.
+545. 00:40:18.409 --> 00:40:25.369 Patient: More to success being an ambiguous term other than just what, you know,
+546. 00:40:26.009 --> 00:40:28.809 Patient: I don't know, like, I'm grasping at straws here.
+547. 00:40:30.648 --> 00:40:31.608 Patient: I really don't...
+548. 00:40:35.527 --> 00:40:35.789 Practitioner: Thanks.
+549. 00:40:35.581 --> 00:40:37.282 Patient: I used to put myself down.
+550. 00:40:37.282 --> 00:40:41.688 Patient: Down and say, i'm not a mix. i'm not doing this. i'm not doing that.
+551. 00:40:42.329 --> 00:40:45.929 Patient: I don't do that anymore because, you know,
+552. 00:40:47.208 --> 00:40:48.969 Patient: Everybody's different.
+553. 00:40:49.369 --> 00:40:53.128 Patient: Everybody has their own thing, you know?
+554. 00:40:54.329 --> 00:40:58.969 Patient: And, you know, sometimes when I'm looking at somebody or something,
+555. 00:40:59.289 --> 00:41:02.329 Patient: I say, oh, man, they must have a really good life.
+556. 00:41:03.128 --> 00:41:05.449 Patient: But I don't know what's in their sick mind either.
+557. 00:41:06.817 --> 00:41:08.516 Patient: The type of junk they carry around.
+558. 00:41:09.369 --> 00:41:11.849 Practitioner: In the past week, have you been hard on yourself?
+559. 00:41:12.409 --> 00:41:12.728 Patient: Yeah.
+560. 00:41:14.489 --> 00:41:17.688 Practitioner: And how often have you felt that way in the past week?
+561. 00:41:18.329 --> 00:41:19.849 Patient: Quite often.
+562. 00:41:20.809 --> 00:41:24.168 Practitioner: Have you felt guilty about anything in the past week?
+563. 00:41:27.369 --> 00:41:27.688 Patient: Yeah.
+564. 00:41:28.648 --> 00:41:28.969 Patient: Yeah.
+565. 00:41:30.248 --> 00:41:30.311 Practitioner: What if
+566. 00:41:30.311 --> 00:41:31.932 Practitioner: What's crossed your mind?
+567. 00:41:37.528 --> 00:41:41.449 Patient: My wife passed away two weeks before I got out of prison.
+568. 00:41:44.889 --> 00:41:46.489 Patient: I wasn't there for her.
+...
+Rating: 6
+Explanation:[2-3 sentences] 
+Key Utterances: [531, 532, 534, 535, 536, 537, 540, 549, 550, 558, 559, 560, 561, 562, 563, 567, 568]
+Most Relevant Question: Have you been putting yourself down or feeling that you're a failure in some way over the past week?

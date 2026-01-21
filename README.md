@@ -1,6 +1,6 @@
-# LlaMADRS: A Systematic Evaluation of Large Language Models for Clinical Depression Assessment in Psychiatric Interviews
+# LlaMADRS: Evaluating Open-Source LLMs on Real Clinical Interviews—To Reason or Not to Reason?
 
-This repository contains the code and resources for the paper "LlaMADRS: A Systematic Evaluation of Large Language Models for Clinical Depression Assessment in Psychiatric Interviews".
+This repository contains the code and resources for the paper "LlaMADRS: Evaluating Open-Source LLMs on Real Clinical Interviews—To Reason or Not to Reason?".
 
 ## CAMI Dataset Poster and links
 The CAMI dataset is a unique resource that includes real patient-clinician interactions and their corresponding expert ratings for depression severity using the Montgomery-Åsberg Depression Rating Scale (MADRS). The dataset was created by researchers at Harvard Medical School and McLean Hospital.
@@ -11,21 +11,6 @@ The CAMI dataset is a unique resource that includes real patient-clinician inter
 
 ## Code Overview
 
-The repository contains the following key scripts:
-
-1. `whisperx_transcription.sh`: Takes care of speech-to-text transcription using the WhisperX model. It processes audio files and generates transcripts in VTT format.
-
-2. `llm_diarize.py`: Handles speaker diarization using the Qwen 2.5 - 72B model. It processes the transcripts and assigns speaker roles (Practitionr or Patient) to each utterance.
-
-3. `llm_segment.py`: Maps utterances to MADRS domains, implementing the segmentation module. It analyzes the content of each utterance and classifies it into the relevant MADRS item.
-
-4. `madrs_predict_holistic.py`: Performs MADRS scoring using different prompting strategies. It takes the full transcript (with diarization) and applies various prompting strategies to assess the depression severity based on the MADRS scale. It generates structured outputs including scores, explanations, and key utterances for each MADRS item.
-
-5. `madrs_predict_segmented.py`: Similar to `madrs_predict_holistic.py`, but it operates on segmented utterances. It uses the output from the segmentation module to score the relevant segment of the conversation for each MADRS item.
-
-6. `evaluation.py`: This script evaluates the performance of the LlaMADRS system against the expert ratings from the CAMI dataset. It calculates metrics such as mean absolute error (MAE), R-squared (R²), and ICC (Intraclass Correlation Coefficient) to assess the accuracy and reliability of the LlaMADRS scores compared to the expert ratings.
-
-These scripts form the core components of the LlaMADRS pipeline, handling preprocessing, segmentation, assessment and evaluation tasks as described in the paper.
 
 ## Prompts
 The `prompts` directory contains various prompt files used for MADRS assessment and segmentation. The directory is organized into several subdirectories, each representing a specific prompting strategy or variant:

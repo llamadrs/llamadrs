@@ -34,11 +34,13 @@ Instructions:
 3. Provide a brief explanation (2-3 sentences) for your rating.
 4. List 2-3 key utterances from the conversation supporting your assessment.
 
-Output Format:
-Rating: [0/1/2/3/4/5/6]
-Explanation: [2-3 sentences]
-Key Utterances: [list of lines from the transcript]
-Most Relevant Question: [question that seems most relevant to the MADRS item]
+Output Format (json):
+{
+  "rating": 0/1/2/3/4/5/6,
+  "explanation": "2-3 sentences",
+  "key_utterances": [list of line numbers from the transcript],
+  "most_relevant_question": "question that seems most relevant to the MADRS item"
+}
 
 Examples:
 Transcript:
