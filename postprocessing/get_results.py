@@ -143,9 +143,9 @@ THRESHOLD_EPOCH = time.mktime(time.strptime("09/07/2025", "%d/%m/%Y"))
 # ---------------------------------------------------------------------------
 # Globals set by CLI (populated in main)
 # ---------------------------------------------------------------------------
-BASE_DIR: Path = Path("../llamadrs/madrs_sessions")
-ORIGINAL_BASE_DIR: Path = Path("../llamadrs/madrs_sessions")
-CSV_MODELS: Path = Path("models_.csv")
+BASE_DIR: Path = Path("../madrs_sessions")
+ORIGINAL_BASE_DIR: Path = Path("../madrs_sessions")
+CSV_MODELS: Path = Path("../models.csv")
 PATIENTS_CSV: Path = Path("../CAMI/cami_patients.csv")
 SESSIONS_CSV: Path = Path("../CAMI/cami_ra_sessions_.csv")
 REPORTS_CSV: Path = Path("../CAMI/CAMI_reports.csv")
@@ -1181,12 +1181,12 @@ def main():
     )
     parser.add_argument(
         "--base-dir", type=str,
-        default="../llamadrs/madrs_sessions",
+        default="../madrs_sessions",
         help="Base directory containing MADRS session data",
     )
     parser.add_argument(
         "--models-csv", type=str, default="../models.csv",
-        help="Path to models_.csv",
+        help="Path to models.csv",
     )
     parser.add_argument(
         "--patients-csv", type=str,

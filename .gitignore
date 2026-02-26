@@ -5,6 +5,10 @@ output/
 CAMI/
 CAMI
 
+# madrs_sessions folder and its contents
+madrs_sessions/
+madrs_sessions
+
 # Python
 __pycache__/
 *.py[cod]
