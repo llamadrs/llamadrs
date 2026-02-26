@@ -1,15 +1,19 @@
-# LlaMADRS: Evaluating Open-Source LLMs on Real Clinical Interviews—To Reason or Not to Reason?
+# LlaMADRS
 
-This repository contains the code and resources for the paper "LlaMADRS: Evaluating Open-Source LLMs on Real Clinical Interviews—To Reason or Not to Reason?".
+Code for the paper:
 
-## CAMI Dataset Poster and links
-The CAMI dataset is a unique resource that includes real patient-clinician interactions and their corresponding expert ratings for depression severity using the Montgomery-Åsberg Depression Rating Scale (MADRS). The dataset was created by researchers at Harvard Medical School and McLean Hospital.
+**LlaMADRS: Evaluating Open-Source LLMs on Real Clinical Interviews — To Reason or Not to Reason?**
 
-- Project: [CAMI dataset](https://bakerlab.mclean.harvard.edu/context-adaptive-multimodal-informatics-for-psychiatric-discharge-planning/). 
-- NIH RePORTER link: [NIH RePORTER](https://reporter.nih.gov/search/a9XdMHOQ20-T4NAcPOFU_Q/project-details/10167040).
-- The Poster is in the [./CAMI_Poster.pdf](https://github.com/llamadrs/llamadrs/blob/main/CAMI_Poster.pdf) file.
+This repo contains scripts for preparing CAMI interview audio/transcripts and running LLM-based diarization, MADRS segmentation, and model evaluation.
 
-## Code Overview
+> Note: CAMI audio and raw transcripts are sensitive and are not distributed with this repository.
+
+---
+
+## CAMI input data structure
+
+A single CAMI session directory typically looks like:
+
 
 
 ## Prompts
