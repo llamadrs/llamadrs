@@ -1,6 +1,9 @@
 # Output folder and its contents
 output/
 
+# CAMI folder and its contents
+CAMI/
+
 # Python
 __pycache__/
 *.py[cod]
