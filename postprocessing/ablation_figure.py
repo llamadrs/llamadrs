@@ -141,7 +141,7 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
 def main():
     parser = argparse.ArgumentParser(description="Generate ablation study figure from analysis results.")
-    parser.add_argument("results_pkl", type=str, nargs="?", default="madrs_analysis_results.pkl",
+    parser.add_argument("results", type=str, nargs="?", default="madrs_analysis_results.pkl",
                         help="Path to the results pickle file (default: madrs_analysis_results.pkl)")
     parser.add_argument("-o", "--output", type=str, default="ablation_study_readable.png",
                         help="Output figure path (default: ablation_study_readable.png)")
@@ -149,7 +149,7 @@ def main():
     parser.add_argument("--no-show", action="store_true", help="Don't display the figure interactively")
     args = parser.parse_args()
 
-    with open(args.results_pkl, "rb") as f:
+    with open(args.results, "rb") as f:
         data = pickle.load(f)
 
     mean_results = data["mean_results"]

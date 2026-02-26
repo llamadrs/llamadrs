@@ -1,0 +1,30 @@
+# Output folder and its contents
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Pickle files
+*.pkl
+
+# Generated figures
+*.png
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.pdf
+temp_table.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
