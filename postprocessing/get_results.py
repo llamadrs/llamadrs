@@ -1185,7 +1185,7 @@ def main():
         help="Base directory containing MADRS session data",
     )
     parser.add_argument(
-        "--models-csv", type=str, default="models_.csv",
+        "--models-csv", type=str, default="../models.csv",
         help="Path to models_.csv",
     )
     parser.add_argument(
