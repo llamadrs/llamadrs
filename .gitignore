@@ -3,6 +3,7 @@ output/
 
 # CAMI folder and its contents
 CAMI/
+CAMI
 
 # Python
 __pycache__/
