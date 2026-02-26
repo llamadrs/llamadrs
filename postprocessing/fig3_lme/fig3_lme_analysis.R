@@ -1,29 +1,20 @@
 library(R6)
 library(readxl)
 library(dplyr)
-library(tidyr)
 library(lme4)
-library(lmerTest)
 library(ggplot2)
-library(svglite)
-library(broom.mixed)
 # NEW
 library(modelbased)   # estimate_grouplevel()
-library(performance)  # check_predictions()
-library(see)
 MADRSErrorAnalysis <- R6Class(
   "MADRSErrorAnalysis",
 
   public = list(
     excel_path = NULL,
     use_within_between = TRUE,
-    use_item_random_intercept = TRUE,
     reml = TRUE,
     maxiter = 2e5,
     aggregate_seeds = TRUE,
-    random_slope_terms = NULL,
     items_data = NULL,
-    full_data = NULL,
     models = list(
       items = list(
         nonreason = NULL,
@@ -33,28 +24,14 @@ MADRSErrorAnalysis <- R6Class(
 
     initialize = function(excel_path,
                           use_within_between = TRUE,
-                          use_item_random_intercept = TRUE,
                           reml = TRUE,
                           maxiter = 2e5,
-                          random_slope_terms = NULL,
                           aggregate_seeds = TRUE) {
       self$excel_path <- excel_path
       self$use_within_between <- use_within_between
-      self$use_item_random_intercept <- use_item_random_intercept
       self$reml <- reml
       self$maxiter <- maxiter
       self$aggregate_seeds <- aggregate_seeds
-
-      # Random-slope candidates — include centered reasoning length Z
-      if (is.null(random_slope_terms)) {
-        self$random_slope_terms <- c(
-          "session_item_severity_patitem_wc_z",
-          "log_tokens_pat_wc_z"
-          ,"log_reason_tokens_patitem_wc_z"
-        )
-      } else {
-        self$random_slope_terms <- random_slope_terms
-      }
     },
 
     # =========================
@@ -94,7 +71,7 @@ MADRSErrorAnalysis <- R6Class(
         long_df <- private$average_over_seeds(long_df)
       }
 
-      long_df <- private$engineer_features(long_df, task = "items")
+      long_df <- private$engineer_features(long_df)
       # filter out rows where is_reasoning is 0
       print(long_df)
       # Factors
@@ -109,90 +86,15 @@ MADRSErrorAnalysis <- R6Class(
       invisible(long_df)
     },
 
-    # =========================
-    # Build FE formula, save per-row design BEFORE fitting
-    # =========================
-    build_and_save_design_matrix = function(csv_path = "../output/model_design_items.csv") {
-      private$require_data("items")
-      df <- self$items_data
-
-      # Fixed effects (no interactions for reasoning-length since 0 for non-reasoning)
-      wc_terms   <- c("session_item_severity_patitem_wc_z",
-                      "log_tokens_pat_wc_z"
-                      ,"log_reason_tokens_patitem_wc_z"
-                      
-                    )
-      mean_terms <- c("session_item_severity_patitem_mean_z",
-                      "log_tokens_pat_mean_z"
-                      ,"log_reason_tokens_patitem_mean_z"
-                      )
-
-      fe_terms <- c(mean_terms, wc_terms,
-                    "log_params_z", "log_context_length_z",
-                    "architecture"
-                    #, "is_reasoning"
-                    )
-      fe_terms <- unique(fe_terms)
-
-      re_parts <- c(
-        "(1 | model_name)",
-        "(1 | patient)",
-        "(1 | session:patient)",
-        "(1 | madrs_item)"
-      )
-
-      required_fe <- unique(fe_terms)
-      missing <- setdiff(required_fe, names(df))
-      if (length(missing)) {
-        stop(sprintf("Missing columns for FE design: %s", paste(missing, collapse = ", ")))
-      }
-
-      fe_formula_str   <- paste("abs_error ~", paste(fe_terms, collapse = " + "))
-      full_formula_str <- paste(fe_formula_str, "+", paste(re_parts, collapse = " + "))
-
-      # Save design (FE only) for auditing
-      mm <- stats::model.matrix(
-        object = stats::as.formula(sub("^abs_error\\s*~", "~", fe_formula_str)),
-        data   = df,
-        contrasts.arg = NULL
-      )
-
-      export_df <- cbind(
-        data.frame(
-          abs_error = df$abs_error,
-          patient   = df$patient,
-          session   = df$session,
-          model_name = df$model_name,
-          madrs_item = df$madrs_item
-        ),
-        as.data.frame(mm)
-      )
-
-      dir.create(dirname(csv_path), recursive = TRUE, showWarnings = FALSE)
-      utils::write.csv(export_df, csv_path, row.names = FALSE)
-      message(sprintf("Saved per-row FE design matrix & IDs to: %s", csv_path))
-
-      list(
-        fe_terms = fe_terms,
-        fe_formula_string = fe_formula_str,
-        full_formula_string = full_formula_str,
-        design_matrix_path = csv_path
-      )
-    },
-
-    # =========================
-    # Modeling
-    # =========================
-    # =========================
 # Stratified fits (non-reasoning vs reasoning), with FE pruning
 # =========================
   fit_stratified_models_items = function() {
-    private$require_data("items")
+    private$require_data()
     df <- self$items_data
 
     # strata
-    df_r <- df %>% dplyr::filter(.data$is_reasoning == 0)
-    df_nr  <- df %>% dplyr::filter(.data$is_reasoning == 1)
+    df_r <- df %>% dplyr::filter(.data$is_reasoning == 1)
+    df_nr  <- df %>% dplyr::filter(.data$is_reasoning == 0)
 
     # candidate FE terms (match your design)
     wc_terms   <- c("session_item_severity_patitem_wc_z",
@@ -201,7 +103,7 @@ MADRSErrorAnalysis <- R6Class(
                     "log_tokens_pat_mean_z")
     reason_terms <- c("log_reason_tokens_patitem_mean_z",
                     "log_reason_tokens_patitem_wc_z")
-    fe_base    <- unique(c(mean_terms, wc_terms, reason_terms,
+    fe_base_r    <- unique(c(mean_terms, wc_terms, reason_terms,
                           "log_params_z", "log_context_length_z",
                           "architecture"))
 
@@ -212,9 +114,9 @@ MADRSErrorAnalysis <- R6Class(
                   "(1 | madrs_item)")
 
     # prune FE per stratum
-    keep_nr <- private$prune_fe_terms(df_nr, fe_base)
+    keep_r <- private$prune_fe_terms(df_r, fe_base_r)
 
-        fe_base    <- unique(c(mean_terms, wc_terms,
+    fe_base_nr    <- unique(c(mean_terms, wc_terms,
                           "log_params_z", "log_context_length_z",
                           "architecture"))
 
@@ -223,8 +125,8 @@ MADRSErrorAnalysis <- R6Class(
                   "(1 | patient)",
                   "(1 | session:patient)",
                   "(1 | madrs_item)")
-    keep_r  <- private$prune_fe_terms(df_r,  fe_base)
-    print(fe_base)
+    keep_nr  <- private$prune_fe_terms(df_nr,  fe_base_nr)
+    print(fe_base_nr)
     cat("\n[NON-REASONING] FE terms:\n")
     print(keep_nr$fe_terms)
     cat("[REASONING] FE terms:\n")
@@ -260,214 +162,10 @@ MADRSErrorAnalysis <- R6Class(
   },
 
 
-    # =========================
-    # Variance Decomposition
-    # =========================
-    variance_decomposition_items = function() {
-  fits <- c("nonreason", "reason")
-  rows <- list()
-
-  # helper to safely read a group's variance (sum diag of VarCorr matrix)
-  get_group_var <- function(vc, group_names) {
-    # try provided names in order; return 0 if none exist
-    for (gn in group_names) {
-      if (gn %in% names(vc)) {
-        return(sum(diag(as.matrix(vc[[gn]]))))
-      }
-    }
-  }
-
-  for (fit_name in fits) {
-    fit <- self$models$items[[fit_name]]
-    if (is.null(fit)) stop(sprintf("No fitted model for '%s'. Run fit_stratified_models_items() first.", fit_name))
-
-    vc <- lme4::VarCorr(fit)
-    var_resid <- stats::sigma(fit)^2
-
-    # allow either "(1 | session:patient)" or "(1 | session)" schemas
-    var_model   <- get_group_var(vc, c("model_name"))
-    var_patient <- get_group_var(vc, c("patient"))
-    var_session <- get_group_var(vc, c("session:patient", "session"))
-    var_task    <- get_group_var(vc, c("madrs_item"))
-
-    var_total <- var_model + var_patient + var_session + var_task + var_resid
-
-    rows[[fit_name]] <- data.frame(
-      fit         = fit_name,
-      var_model   = var_model,
-      var_patient = var_patient,
-      var_session = var_session,
-      var_task    = var_task,
-      var_residual= var_resid,
-      var_total   = var_total,
-      pct_model   = 100 * var_model   / var_total,
-      pct_patient = 100 * var_patient / var_total,
-      pct_session = 100 * var_session / var_total,
-      pct_task    = 100 * var_task    / var_total,
-      pct_residual= 100 * var_resid   / var_total,
-      row.names   = NULL
-    )
-  }
-
-  out_df <- dplyr::bind_rows(rows)
-
-  # also return as nested named lists to match your existing usage style
-  to_named_list <- function(col) {
-    x <- as.list(stats::setNames(out_df[[col]], out_df$fit))
-    # ensure plain numerics (not data frames)
-    lapply(x, as.numeric)
-  }
-
-  list(
-    # per-component raw variances
-    var_model    = to_named_list("var_model"),
-    var_patient  = to_named_list("var_patient"),
-    var_session  = to_named_list("var_session"),
-    var_task     = to_named_list("var_task"),
-    var_residual = to_named_list("var_residual"),
-    var_total    = to_named_list("var_total"),
-
-    # per-component percentages
-    pct_model    = to_named_list("pct_model"),
-    pct_patient  = to_named_list("pct_patient"),
-    pct_session  = to_named_list("pct_session"),
-    pct_task     = to_named_list("pct_task"),
-    pct_residual = to_named_list("pct_residual"),
-
-    # convenient tidy frame for plotting
-    table        = out_df
-  )
-},
-
-    # =========================
-    # Reasoning vs Non-Reasoning (paired by patient)
-    # =========================
-    
-
-    # =========================
-    # Diagnostics (classic + prediction checks)
-    # =========================
-    plot_diagnostics_items = function(output_dir = "../output/diagnostics_items") {
-  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-
-  save_png <- function(path, expr, width = 800, height = 600) {
-    png(path, width = width, height = height)
-    on.exit(dev.off(), add = TRUE)
-    force(expr)
-  }
-
-  for (fit_name in c("nonreason", "reason")) {
-    res <- self$models$items[[fit_name]]
-    if (is.null(res)) {
-      warning(sprintf("Skipping '%s': no fitted model found.", fit_name))
-      next
-    }
-
-    # Use the model's own frame to avoid row-order or filtering mismatches
-    mf   <- tryCatch(stats::model.frame(res), error = function(e) NULL)
-    if (is.null(mf)) {
-      warning(sprintf("Skipping '%s': could not retrieve model.frame().", fit_name))
-      next
-    }
-
-    y     <- stats::model.response(mf)               # observed (abs_error)
-    mu    <- stats::fitted(res)                      # fitted
-    resid <- y - mu
-    sig   <- stats::sigma(res)
-
-    # 1) Residuals histogram
-    save_png(file.path(output_dir, sprintf("residual_hist_%s.png", fit_name)), {
-      hist(resid, breaks = 40, main = sprintf("Residuals Histogram (%s)", fit_name),
-           xlab = "Residual", col = "lightblue", border = "white")
-    })
-
-    # 2) Residuals QQ
-    save_png(file.path(output_dir, sprintf("residual_qq_%s.png", fit_name)), {
-      qqnorm(resid, main = sprintf("Residuals Q-Q Plot (%s)", fit_name))
-      qqline(resid, col = "red")
-    })
-
-    # 3) Posterior predictive–style check (parametric replicate)
-    set.seed(123)
-    y_rep <- mu + stats::rnorm(length(mu), 0, sig)
-
-    save_png(file.path(output_dir, sprintf("ppc_hist_%s.png", fit_name)), {
-      hist(y,     breaks = 40, col = rgb(0,0,1,0.5),  border = "white",
-           main = sprintf("Posterior Predictive Check (%s)", fit_name),
-           xlab = "Absolute Error", freq = FALSE)
-      hist(y_rep, breaks = 40, col = rgb(1,0,0,0.3), border = "white",
-           add = TRUE, freq = FALSE)
-      legend("topright", c("Observed", "Replicated"),
-             fill = c(rgb(0,0,1,0.5), rgb(1,0,0,0.3)), bty = "n")
-    })
-
-    cat(sprintf("Saved diagnostics for %s to %s/\n", fit_name, output_dir))
-  }
-},
-
-run_prediction_checks = function(output_base = "../output/diagnostics_items/check_predictions") {
-  dir.create(dirname(output_base), recursive = TRUE, showWarnings = FALSE)
-
-  save_one <- function(plot_obj, path_base) {
-    # handle single ggplot or patchwork
-    if (inherits(plot_obj, "ggplot") || inherits(plot_obj, "patchwork")) {
-      ggplot2::ggsave(filename = paste0(path_base, ".png"),
-                      plot = plot_obj, width = 7.2, height = 5.0, dpi = 300)
-      message(sprintf("Saved prediction checks to '%s.png'", path_base))
-      return(invisible(TRUE))
-    }
-
-    # handle list of plots
-    if (is.list(plot_obj) && length(plot_obj) > 0) {
-      for (i in seq_along(plot_obj)) {
-        if (inherits(plot_obj[[i]], "ggplot") || inherits(plot_obj[[i]], "patchwork")) {
-          ggplot2::ggsave(filename = sprintf("%s_%02d.png", path_base, i),
-                          plot = plot_obj[[i]], width = 7.2, height = 5.0, dpi = 300)
-        }
-      }
-      message(sprintf("Saved multi-panel prediction checks to '%s_XX.png'", path_base))
-      return(invisible(TRUE))
-    }
-
-    # fallback device
-    png(filename = paste0(path_base, "_fallback.png"), width = 720, height = 500)
-    on.exit(dev.off(), add = TRUE)
-    print(plot_obj)
-    message(sprintf("Saved prediction checks to '%s_fallback.png' (fallback renderer)", path_base))
-    invisible(TRUE)
-  }
-
-  for (fit_name in c("nonreason", "reason")) {
-    fit <- self$models$items[[fit_name]]
-    if (is.null(fit)) {
-      warning(sprintf("Skipping '%s': no fitted model found.", fit_name))
-      next
-    }
-
-    # Compute diagnostics via performance::check_predictions()
-    perf_obj <- performance::check_predictions(fit)
-
-    # Turn into ggplot object(s) via {see}
-    g <- tryCatch(see::plot(perf_obj), error = function(e) {
-      warning(sprintf("plot(check_predictions()) failed for '%s': %s", fit_name, e$message))
-      NULL
-    })
-
-    if (!is.null(g)) {
-      save_one(g, sprintf("%s_%s", output_base, fit_name))
-    }
-  }
-
-  invisible(output_base)
-},
 
 # BLUPs (items) via modelbased — stratified (nonreason / reason)
 # =========================
-plot_task_blups = function(output_base = "../output/blups_task", csv_base = "../output/blups_task") {
-  if (!self$use_item_random_intercept) {
-    message("No task random intercept in this model. Skipping BLUP plots.")
-    return(invisible(NULL))
-  }
+plot_task_blups = function(output_base = "../output/blups", csv_base = "../output/blups") {
 
   # --- helpers ---
   norm_cols <- function(x) {
@@ -526,7 +224,7 @@ plot_task_blups = function(output_base = "../output/blups_task", csv_base = "../
     df$label <- factor(item_labels[df$madrs_item], levels = item_labels[df$madrs_item])
 
     # --- write CSV for auditing ---
-    csv_path <- sprintf("%s_%s_total_and_random.csv", csv_base, fit_name)
+    csv_path <- sprintf("%s_%s.csv", csv_base, fit_name)
     dir.create(dirname(csv_path), recursive = TRUE, showWarnings = FALSE)
     utils::write.csv(df, csv_path, row.names = FALSE)
     message(sprintf("Wrote item BLUPs to '%s'", csv_path))
@@ -631,60 +329,6 @@ generate_report_items = function(output_path = "../output/error_analysis_items.t
     cat(sprintf("isSingular(fit): %s\n\n", lme4::isSingular(fit)))
   }
 
-  # ----------------------------------------
-  # Variance decomposition (stratified)
-  # ----------------------------------------
-  cat(strrep("-", 80), "\n", sep = "")
-  cat("VARIANCE DECOMPOSITION (shares by source)\n")
-  cat(strrep("-", 80), "\n", sep = "")
-
-  var <- self$variance_decomposition_items()
-  # var is a list of lists keyed by fit_name per your stratified function
-  # assemble a neat table:
-  try({
-    fits <- intersect(names(var$pct_model), c("nonreason", "reason"))
-    if (length(fits) > 0) {
-      header <- sprintf("%-12s %-10s %-10s %-10s %-10s %-10s\n",
-                        "Fit", "Model", "Patient", "Session", "Task", "Residual")
-      cat(header)
-      cat(strrep("-", nchar(header)), "\n", sep = "")
-
-      for (fn in fits) {
-        cat(sprintf("%-12s %-10.2f %-10.2f %-10.2f %-10.2f %-10.2f\n",
-                    fn,
-                    as.numeric(var$pct_model[[fn]]),
-                    as.numeric(var$pct_patient[[fn]]),
-                    as.numeric(var$pct_session[[fn]]),
-                    as.numeric(var$pct_task[[fn]]),
-                    as.numeric(var$pct_residual[[fn]])))
-      }
-      cat("\n")
-    } else {
-      cat("No variance decomposition available.\n\n")
-    }
-  }, silent = TRUE)
-
-  # ----------------------------------------
-  # Paired by-patient reasoning effect (ΔMAE)
-  # ----------------------------------------
-  cat(strrep("-", 80), "\n", sep = "")
-  cat("REASONING EFFECT (PAIRED T-TEST BY PATIENT)\n")
-  cat(strrep("-", 80), "\n", sep = "")
-
-  ttest_res <- try(self$test_reasoning_effect_items(), silent = TRUE)
-  if (inherits(ttest_res, "try-error") || is.null(ttest_res)) {
-    cat("Insufficient overlapping patients for paired test or error computing test.\n\n")
-  } else {
-    pretty <- c(
-      "n_patients", "reasoning_mae", "non_reasoning_mae",
-      "mean_difference", "t_statistic", "p_value",
-      "cohens_d", "ci_95_lower", "ci_95_upper"
-    )
-    for (k in pretty) if (!is.null(ttest_res[[k]])) {
-      cat(sprintf("%-22s: %s\n", k, format(ttest_res[[k]])))
-    }
-    cat("\n")
-  }
 
   cat(sprintf("Item-level report saved to %s\n", output_path))
   invisible(output_path)
@@ -793,7 +437,7 @@ build_formula = function(response, fe_terms, re_terms) {
       out
     },
 
-    engineer_features = function(df, task) {
+    engineer_features = function(df) {
       out <- df
 
       # Model params
@@ -839,11 +483,11 @@ build_formula = function(response, fe_terms, re_terms) {
           dplyr::ungroup()
       }
 
-      out <- private$add_standardizations(out, task = task)
+      out <- private$add_standardizations(out)
       out
     },
 
-    add_standardizations = function(df, task) {
+    add_standardizations = function(df) {
       out <- df
       standardize_if_ok <- function(x) {
         mu <- mean(x, na.rm = TRUE)
@@ -928,14 +572,9 @@ build_formula = function(response, fe_terms, re_terms) {
       collapsed
     },
 
-    require_data = function(which) {
-      if (which == "items") {
+    require_data = function() {
         if (is.null(self$items_data) || nrow(self$items_data) == 0)
           stop("items_data empty. Run load_and_prepare_items_data() first.")
-      } else if (which == "full") {
-        if (is.null(self$full_data) || nrow(self$full_data) == 0)
-          stop("full_data empty. Run load_and_prepare_full_data() first.")
-      }
     },
 
     get_item_name = function(idx) {
@@ -972,14 +611,8 @@ build_formula = function(response, fe_terms, re_terms) {
       analyzer <- MADRSErrorAnalysis$new(
         file.path(output_dir, "llamadrs_predictions.xlsx"),
         use_within_between = TRUE,
-        use_item_random_intercept = TRUE,
         reml = TRUE,
         maxiter = 2e5,
-        random_slope_terms = c(
-          "session_item_severity_patitem_wc_z",
-          "log_tokens_pat_wc_z",
-          "log_reason_tokens_patitem_wc_z"
-        ),
         aggregate_seeds = TRUE
       )
       cat("Loading and preparing task-level data...\n")
@@ -996,14 +629,8 @@ build_formula = function(response, fe_terms, re_terms) {
     analyzer <- MADRSErrorAnalysis$new(
       file.path(output_dir, "llamadrs_predictions.xlsx"),
       use_within_between = TRUE,
-      use_item_random_intercept = TRUE,
       reml = TRUE,
       maxiter = 2e5,
-      random_slope_terms = c(
-        "session_item_severity_patitem_wc_z",
-        "log_tokens_pat_wc_z",
-        "log_reason_tokens_patitem_wc_z"
-      ),
       aggregate_seeds = TRUE
     )
     cat("Loading and preparing task-level data...\n")
@@ -1019,48 +646,15 @@ build_formula = function(response, fe_terms, re_terms) {
   # -----------------------------
   # Outputs (for both fits)
   # -----------------------------
-  cat("\nSaving diagnostics (per fit)...\n")
-  analyzer$plot_diagnostics_items(output_dir = file.path(output_dir, "diagnostics_items"))
-
-  cat("Running prediction checks (per fit)...\n")
-  # reuse your existing run_prediction_checks() by temporarily pointing
-  # analyzer$models$items$interaction at each fit (nonreason, then reason)
-  # so you don't have to write a new function.
-  old_interaction <- analyzer$models$items$interaction
-
-  analyzer$models$items$interaction <- analyzer$models$items$nonreason
-  analyzer$run_prediction_checks(output_base = file.path(output_dir, "diagnostics_items/check_predictions_nonreason"))
-
-  analyzer$models$items$interaction <- analyzer$models$items$reason
-  analyzer$run_prediction_checks(output_base = file.path(output_dir, "diagnostics_items/check_predictions_reason"))
-
-  analyzer$models$items$interaction <- old_interaction
 
   cat("Generating report (both fits + variance + paired test)...\n")
   analyzer$generate_report_items(file.path(output_dir, "error_analysis_items.txt"))
 
   cat("Plotting task BLUPs (per fit)...\n")
-  # Same trick as above: reuse plot_task_blups() for each fit
-  old_interaction <- analyzer$models$items$interaction
 
-  analyzer$models$items$interaction <- analyzer$models$items$nonreason
-  analyzer$plot_task_blups(output_base = file.path(output_dir, "blups_task_nonreason"),
-                           csv_base    = file.path(output_dir, "blups_task_nonreason"))
+  analyzer$plot_task_blups(output_base = file.path(output_dir, "blups"),
+                           csv_base    = file.path(output_dir, "blups"))
 
-  analyzer$models$items$interaction <- analyzer$models$items$reason
-  analyzer$plot_task_blups(output_base = file.path(output_dir, "blups_task_reason"),
-                           csv_base    = file.path(output_dir, "blups_task_reason"))
-
-  analyzer$models$items$interaction <- old_interaction
-
-  # Figures (overlay both fits)
-  cat("Generating overlay figures...\n")
-  source("fig3_lme_figures.R")
-  make_full_plots_overlay(
-    fit_nonreason = analyzer$models$items$nonreason,
-    fit_reason    = analyzer$models$items$reason,
-    outdir        = file.path(output_dir, "madrs_figs/items")
-  )
 
   cat("\n✓ Done!\n")
 }
