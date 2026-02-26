@@ -10,6 +10,9 @@ from scipy import stats
 from typing import Dict, List, Tuple, Optional
 import re
 import pickle
+import argparse
+from pathlib import Path
+
 
 MODEL_DICT = {
     "segmented_Qw3_0.6b_gptq_4q": "Qwen 3 (0.6B)",
@@ -25,8 +28,8 @@ MODEL_DICT = {
     "segmented_PsyCare1.0_Llama3.1_8b": "PsyCare 1.0 Llama 3.1 (8B)",
     "segmented_Llama3.1_8b": "Llama 3.1 (8B): No Quant",
     "segmented_Qw3_30b_a3b_ar_4q": "Qwen 3 (3B-30B)",
-    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3 (3B-30B): No Reasoning",
-    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 (27B) IT",
+    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3: No Reasoning (3B-30B)",
+    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 IT (27B)",
     "segmented_Qw3_32b_awq_4q": "Qwen 3 (32B)",
     "segmented_QwQ_32b_awq_4q": "QwQ (32B)",
     "segmented_DeepSeek_R1_Qwen_32b_gptq_4q": "DeepSeek R1 Qwen 2.5 (32B)",
@@ -38,13 +41,14 @@ MODEL_DICT = {
     "segmented_GPT_OSS_120b_mxfp4_4q": "GPT OSS 120B (5B-117B)",
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next (80B): No Reasoning",
+    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
 }
 # add ablations
 for ablation in ["raw", "no_desc", "no_dem"]:
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next (80B): {ablation.replace('_', ' ').title()}"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next (80B): No Reasoning, {ablation.replace('_', ' ').title()}"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
+
 
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
@@ -289,33 +293,48 @@ def generate_all_academic_tables(
 # ============================================================================
 
 if __name__ == "__main__":
-    # Example usage with your data
+    parser = argparse.ArgumentParser(
+        description="Generate item-wise LaTeX tables from get_results.py outputs"
+    )
+    parser.add_argument(
+        "--results", type=str, default="../output/llamadrs_results.pkl",
+        help="Path to results pickle produced by get_results.py",
+    )
+    parser.add_argument(
+        "-o", "--output", type=str, default="../output/table2_item_scores.tex",
+        help="Output .tex file path",
+    )
+    args = parser.parse_args()
+
+    results_path = Path(args.results)
+    out_path = Path(args.output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
     try:
-        with open("madrs_analysis_results.pkl", "rb") as f:
+        with results_path.open("rb") as f:
             data = pickle.load(f)
-            individual_results = data["individual_results"]
-            mean_results = data["mean_results"]
-            binary_results = data.get("binary_results", None)
-            sum_results = data.get("sum_results", None)
-            models_csv = data.get("models_csv", None)
-
-        # Generate tables (toggle ranking table above if desired)
-        latex_output = generate_all_academic_tables(
-            individual_results,
-            mean_results,
-            binary_results,
-            sum_results,
-            models_csv,
-            output_file="table_model_items.tex",
-        )
-
-        print("\n" + "="*70)
-        print("Table generation complete!")
-        print("="*70)
-
     except FileNotFoundError:
-        print("Data file not found. Please run analysis first.")
-        print("Example data structure needed:")
-        print("  - individual_results: Dict[model_name, Dict[item, metrics]]")
-        print("  - mean_results: Dict[model_name, metrics]")
-        print("  - binary_results: Dict[model_name, classification_metrics]")
+        print(f"Results file not found: {results_path}")
+        print("Run get_results.py first to create ../output/llamadrs_results.pkl")
+        raise SystemExit(2)
+
+    individual_results = data.get("individual_results", {})
+    mean_results = data.get("mean_results", {})
+    binary_results = data.get("binary_results", None)
+    sum_results = data.get("sum_results", None)
+    models_csv = data.get("models_csv", None)
+
+    # Generate tables
+    _ = generate_all_academic_tables(
+        individual_results,
+        mean_results,
+        binary_results,
+        sum_results,
+        models_csv,
+        output_file=str(out_path),
+    )
+
+    print("\n" + "=" * 70)
+    print("Table generation complete!")
+    print(f"Output file: {out_path}")
+    print("=" * 70)

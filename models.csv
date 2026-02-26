@@ -1,6 +1,6 @@
 model_path,short_name,gpu_vram_gb,context_length,model_family,quantization,reasoning,architecture,active_params,total_params,tp_size
-Intel/Qwen3-Next-80B-A3B-Instruct-int4-AutoRound,Qw3_Next_80b_a3b_ar_4q_NoR,39.59,262144,Qwen3-Next,AR-Int4,No,MoE,20B,80B,4
-Intel/Qwen3-Next-80B-A3B-Thinking-int4-AutoRound,Qw3_Next_80b_a3b_ar_4q,39.59,262144,Qwen3-Next,AR-Int4,Yes,MoE,20B,80B,4
+Intel/Qwen3-Next-80B-A3B-Instruct-int4-AutoRound,Qw3_Next_80b_a3b_ar_4q_NoR,39.59,262144,Qwen3-Next,AR-Int4,No,MoE,3B,80B,1
+Intel/Qwen3-Next-80B-A3B-Thinking-int4-AutoRound,Qw3_Next_80b_a3b_ar_4q,39.59,262144,Qwen3-Next,AR-Int4,Yes,MoE,3B,80B,1
 openai/gpt-oss-20b,GPT_OSS_20b_mxfp4_4q,16,131072,GPT-OSS,MXFP4-4bit,Yes,MoE,3.6B,21B,1
 Intel/Qwen3-30B-A3B-Thinking-2507-int4-AutoRound,Qw3_30b_a3b_ar_4q,14.07,262144,Qwen3,AR-Int4,Yes,MoE,3B,30B,1
 cpatonn/Magistral-Small-2507-AWQ-4bit,Magistral_Small_2507_awq_4q,10.66,40960,Mistral,AWQ-4bit,Yes,Dense,24B,24B,1

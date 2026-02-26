@@ -31,6 +31,7 @@ import numpy as np
 import pandas as pd
 import tiktoken
 from sklearn.metrics import (
+    cohen_kappa_score,
     f1_score,
     mean_absolute_error,
     precision_score,
@@ -85,6 +86,7 @@ MADRS_ITEM_NAMES = {
     10: "Suicidal Thoughts",
 }
 
+
 MODEL_DICT = {
     "segmented_Qw3_0.6b_gptq_4q": "Qwen 3 (0.6B)",
     "segmented_Qw3_1.7b_gptq_4q": "Qwen 3 (1.7B)",
@@ -99,8 +101,8 @@ MODEL_DICT = {
     "segmented_PsyCare1.0_Llama3.1_8b": "PsyCare 1.0 Llama 3.1 (8B)",
     "segmented_Llama3.1_8b": "Llama 3.1 (8B): No Quant",
     "segmented_Qw3_30b_a3b_ar_4q": "Qwen 3 (3B-30B)",
-    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3 (3B-30B): No Reasoning",
-    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 (27B) IT",
+    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3: No Reasoning (3B-30B)",
+    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 IT (27B)",
     "segmented_Qw3_32b_awq_4q": "Qwen 3 (32B)",
     "segmented_QwQ_32b_awq_4q": "QwQ (32B)",
     "segmented_DeepSeek_R1_Qwen_32b_gptq_4q": "DeepSeek R1 Qwen 2.5 (32B)",
@@ -112,20 +114,16 @@ MODEL_DICT = {
     "segmented_GPT_OSS_120b_mxfp4_4q": "GPT OSS 120B (5B-117B)",
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next (80B): No Reasoning",
+    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
 }
+# add ablations
+for ablation in ["raw", "no_desc", "no_dem"]:
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
 
-# Add ablation variants
-for _abl in ["raw", "no_desc", "no_dem"]:
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{_abl}"] = (
-        f"Qwen 3 Next (80B): {_abl.replace('_', ' ').title()}"
-    )
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{_abl}"] = (
-        f"Qwen 3 Next (80B): No Reasoning, {_abl.replace('_', ' ').title()}"
-    )
-    MODEL_DICT[f"segmented_Qw3_235b_a22b_ar_4q_{_abl}"] = (
-        f"Qwen 3 (22B-235B): {_abl.replace('_', ' ').title()}"
+    MODEL_DICT[f"segmented_Qw3_235b_a22b_ar_4q_{ablation}"] = (
+        f"Qwen 3: {ablation.replace('_', ' ').title()} (22B-235B)"
     )
 
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
@@ -306,10 +304,9 @@ def _process_session_worker(args):
             else:
                 ground_truth = int(sess_data[_MADRS_DICT[madrs_item]])
                 gt_cap = _GT_CAP_ITEM
+                
+            
             backoff = ground_truth - gt_cap
-
-            if ground_truth > gt_cap:
-                ground_truth = int(str(ground_truth)[0])
 
             pred_tuple = file_index.get((madrs_item, run))
             failure = 0
@@ -542,9 +539,11 @@ class MADRSProcessor:
             if int(item_failures.sum()) >= item_ratings.size - 10:
                 continue
 
+
             individual_metrics[madrs_item] = {
                 "mae": float(mean_absolute_error(item_ground_truths, item_ratings)),
                 "r2": float(r2_score(item_ground_truths, item_ratings)),
+                "qwk": float(cohen_kappa_score(item_ground_truths, item_ratings, weights='quadratic')),
                 "failures": int(item_failures.sum()),
             }
 
@@ -555,7 +554,7 @@ class MADRSProcessor:
     ):
         run_results = []
         run_individual_metrics = []
-        run_mean_maes, run_mean_r2s, run_count_failures = [], [], []
+        run_mean_maes, run_mean_r2s, run_count_failures, run_mean_qwks = [], [], [], []
 
         for run in tqdm(runs, desc=f"Processing runs for {model_name}"):
             results_list, individual_metrics = self.process_model_run_parallel(
@@ -580,6 +579,12 @@ class MADRSProcessor:
                         [m["r2"] for m in usable if not np.isnan(m.get("r2", np.nan))]
                     )
                 )
+                
+                run_mean_qwks.append(
+                    float(np.mean(
+                    [m["qwk"] for m in usable if np.isfinite(m.get("qwk", np.nan))]
+                    ))
+                )
                 run_count_failures.append(
                     np.sum([m.get("failures", 0) for m in usable])
                 )
@@ -589,6 +594,7 @@ class MADRSProcessor:
             run_individual_metrics,
             run_mean_maes,
             run_mean_r2s,
+            run_mean_qwks,
             run_count_failures,
         )
 
@@ -763,6 +769,7 @@ class MADRSProcessor:
                 run_individual_metrics,
                 run_mean_maes,
                 run_mean_r2s,
+                run_mean_qwks,
                 run_count_failures,
             ) = self.process_model_runs_batch(
                 output_dir, model_name, valid, runs=range(0, 3)
@@ -882,6 +889,11 @@ class MADRSProcessor:
                     for m in run_individual_metrics
                     if madrs_item in m
                 ]
+                item_qwks = [
+                    m[madrs_item].get("qwk", float("nan"))
+                    for m in run_individual_metrics
+                    if madrs_item in m
+                ]
                 item_failures = [
                     m[madrs_item]["failures"]
                     for m in run_individual_metrics
@@ -913,6 +925,16 @@ class MADRSProcessor:
                         ),
                         "r2_std": (
                             float(np.std(item_r2s)) if len(item_r2s) > 1 else 0.0
+                        ),
+                        "qwk_mean": (
+                            float(np.mean(item_qwks))
+                            if len(item_qwks) > 0
+                            else float("nan")
+                        ),
+                        "qwk_std": (
+                            float(np.std(item_qwks))
+                            if len(item_qwks) > 1
+                            else 0.0
                         ),
                         "num_samples": int(max_num_samples),
                         "failures_mean": (
@@ -954,7 +976,7 @@ def calculate_sum_predictions(processor, valid_sessions, models_csv_dict):
 
     for output_dir, model_name in MODEL_DICT.items():
         print(f"Calculating sum predictions for {model_name}...")
-        run_results, _, _, _, _ = processor.process_model_runs_batch(
+        run_results, _, _, _, _, _ = processor.process_model_runs_batch(
             output_dir, model_name, valid_sessions, runs=range(0, 3)
         )
 
@@ -992,6 +1014,7 @@ def calculate_sum_predictions(processor, valid_sessions, models_csv_dict):
                     {
                         "mae": float(mean_absolute_error(ground_truths, predictions)),
                         "r2": float(r2_score(ground_truths, predictions)),
+                        "qwk": float(cohen_kappa_score(ground_truths, predictions, weights='quadratic')),
                         "failures": failures,
                         "n_samples": len(predictions),
                     }
@@ -1003,6 +1026,8 @@ def calculate_sum_predictions(processor, valid_sessions, models_csv_dict):
                 "mae_std": float(np.std([m["mae"] for m in run_metrics])),
                 "r2_mean": float(np.mean([m["r2"] for m in run_metrics])),
                 "r2_std": float(np.std([m["r2"] for m in run_metrics])),
+                "qwk_mean": float(np.mean([m["qwk"] for m in run_metrics])),
+                "qwk_std": float(np.std([m["qwk"] for m in run_metrics])),
                 "failures_mean": float(
                     np.mean([m["failures"] for m in run_metrics])
                 ),
@@ -1029,7 +1054,7 @@ def calculate_binary_classification_metrics(
 
     for output_dir, model_name in MODEL_DICT.items():
         print(f"Calculating binary F1 for {model_name}...")
-        run_results, _, _, _, _ = processor.process_model_runs_batch(
+        run_results, _, _, _, _, _ = processor.process_model_runs_batch(
             output_dir, model_name, valid_sessions, runs=range(0, 3)
         )
 
@@ -1382,7 +1407,8 @@ def main():
             print(
                 f"  {model_name}: "
                 f"MAE={metrics['mae_mean']:.3f}±{metrics['mae_std']:.3f}  "
-                f"R²={metrics['r2_mean']:.3f}±{metrics['r2_std']:.3f}"
+                f"R²={metrics['r2_mean']:.3f}±{metrics['r2_std']:.3f}  "
+                f"QWK={metrics.get('qwk_mean', float('nan')):.3f}±{metrics.get('qwk_std', float('nan')):.3f}  "
             )
 
     print("\nDone.")

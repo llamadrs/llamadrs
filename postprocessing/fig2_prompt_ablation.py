@@ -38,10 +38,10 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     # ---- Configs (each will render two boxes: R and NR)
     configs = [
-        ("All Components",        "Qwen 3 Next (80B)",                   "Qwen 3 Next (80B): No Reasoning"),
-        ("No Descriptions",       "Qwen 3 Next (80B): No Desc",          "Qwen 3 Next (80B): No Reasoning, No Desc"),
-        ("No Demonstrations",     "Qwen 3 Next (80B): No Dem",           "Qwen 3 Next (80B): No Reasoning, No Dem"),
-        ("Raw (No Desc, No Dem)",     "Qwen 3 Next (80B): Raw",              "Qwen 3 Next (80B): No Reasoning, Raw"),
+        ("All Components",        "Qwen 3 Next (3B-80B)",                   "Qwen 3 Next (3B-80B): No Reasoning"),
+        ("No Descriptions",       "Qwen 3 Next (3B-80B): No Desc",          "Qwen 3 Next (3B-80B): No Reasoning, No Desc"),
+        ("No Demonstrations",     "Qwen 3 Next (3B-80B): No Dem",           "Qwen 3 Next (3B-80B): No Reasoning, No Dem"),
+        ("Raw (No Desc, No Dem)",     "Qwen 3 Next (3B-80B): Raw",              "Qwen 3 Next (3B-80B): No Reasoning, Raw"),
     ]
 
     # MADRS items 1..10

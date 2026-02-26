@@ -11,6 +11,7 @@ from typing import Dict, List, Tuple, Optional
 import re
 import pickle
 
+
 MODEL_DICT = {
     "segmented_Qw3_0.6b_gptq_4q": "Qwen 3 (0.6B)",
     "segmented_Qw3_1.7b_gptq_4q": "Qwen 3 (1.7B)",
@@ -25,8 +26,8 @@ MODEL_DICT = {
     "segmented_PsyCare1.0_Llama3.1_8b": "PsyCare 1.0 Llama 3.1 (8B)",
     "segmented_Llama3.1_8b": "Llama 3.1 (8B): No Quant",
     "segmented_Qw3_30b_a3b_ar_4q": "Qwen 3 (3B-30B)",
-    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3 (3B-30B): No Reasoning",
-    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 (27B) IT",
+    "segmented_Qw3_30b_a3b_ar_4q_NoR": "Qwen 3: No Reasoning (3B-30B)",
+    "segmented_Gen3_27b_it_gptq_4q": "Gemma 3 IT (27B)",
     "segmented_Qw3_32b_awq_4q": "Qwen 3 (32B)",
     "segmented_QwQ_32b_awq_4q": "QwQ (32B)",
     "segmented_DeepSeek_R1_Qwen_32b_gptq_4q": "DeepSeek R1 Qwen 2.5 (32B)",
@@ -38,15 +39,14 @@ MODEL_DICT = {
     "segmented_GPT_OSS_120b_mxfp4_4q": "GPT OSS 120B (5B-117B)",
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next (80B): No Reasoning",
+    "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
 }
 # add ablations
 for ablation in ["raw", "no_desc", "no_dem"]:
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next (80B): {ablation.replace('_', ' ').title()}"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next (80B): {ablation.replace('_', ' ').title()}"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next (80B): No Reasoning, {ablation.replace('_', ' ').title()}"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next (80B): No Reasoning, {ablation.replace('_', ' ').title()}"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
+
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
 # ============================================================================
