@@ -1,4 +1,4 @@
-# mixed_effects_figures.R
+# fig3_lme_figures.R
 # Overlay fixed-effect and BLUP plots for stratified mixed-effects models
 # Adapted from madrs_figs_fixed.R for the llamadrs postprocessing pipeline
 suppressPackageStartupMessages({

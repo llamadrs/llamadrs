@@ -1055,7 +1055,7 @@ build_formula = function(response, fe_terms, re_terms) {
 
   # Figures (overlay both fits)
   cat("Generating overlay figures...\n")
-  source("mixed_effects_figures.R")
+  source("fig3_lme_figures.R")
   make_full_plots_overlay(
     fit_nonreason = analyzer$models$items$nonreason,
     fit_reason    = analyzer$models$items$reason,

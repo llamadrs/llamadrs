@@ -7,13 +7,13 @@ suppressPackageStartupMessages({
   library(purrr)
 })
 
-# Source the fixed plotting functions (assumes mixed_effects_figures.R is in same directory)
-if (file.exists("mixed_effects_figures.R")) {
-  source("mixed_effects_figures.R")
-} else if (file.exists("../mixed_effects_figures.R")) {
-  source("../mixed_effects_figures.R")
+# Source the fixed plotting functions (assumes fig3_lme_figures.R is in same directory)
+if (file.exists("fig3_lme_figures.R")) {
+  source("fig3_lme_figures.R")
+} else if (file.exists("../fig3_lme_figures.R")) {
+  source("../fig3_lme_figures.R")
 } else {
-  stop("Cannot find mixed_effects_figures.R. Please ensure it's in the working directory.")
+  stop("Cannot find fig3_lme_figures.R. Please ensure it's in the working directory.")
 }
 
 # -------------------------------
