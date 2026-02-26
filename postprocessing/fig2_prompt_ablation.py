@@ -29,8 +29,8 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     # ---- Box fill colors (blue & orange for high contrast)
     header_gray = _xcolor_mix_to_rgb("white!85")
-    r_hdr_col   = _xcolor_mix_to_rgb("blue!30")
-    nr_hdr_col  = _xcolor_mix_to_rgb("orangered!30")
+    r_hdr_col   = "#6558A6"
+    nr_hdr_col  = "#9A7540"
 
     # Strong accent colors for annotations
     strong_blue   = mcolors.to_rgb("blue")
@@ -38,10 +38,10 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     # ---- Configs (each will render two boxes: R and NR)
     configs = [
-        ("All Components",        "Qwen 3 Next (3B-80B)",                   "Qwen 3 Next (3B-80B): No Reasoning"),
-        ("No Descriptions",       "Qwen 3 Next (3B-80B): No Desc",          "Qwen 3 Next (3B-80B): No Reasoning, No Desc"),
-        ("No Demonstrations",     "Qwen 3 Next (3B-80B): No Dem",           "Qwen 3 Next (3B-80B): No Reasoning, No Dem"),
-        ("Raw (No Desc, No Dem)",     "Qwen 3 Next (3B-80B): Raw",              "Qwen 3 Next (3B-80B): No Reasoning, Raw"),
+        ("All Components",        "Qwen 3 Next (3B-80B)",               "Qwen 3 Next: NR (3B-80B)"),
+        ("No Descriptions",       "Qwen 3 Next: No Desc (3B-80B)",       "Qwen 3 Next: NR, No Desc (3B-80B)"),
+        ("No Demonstrations",     "Qwen 3 Next: No Dem (3B-80B)",        "Qwen 3 Next: NR, No Dem (3B-80B)"),
+        ("Raw (No Desc, No Dem)", "Qwen 3 Next: Raw (3B-80B)",           "Qwen 3 Next: NR, Raw (3B-80B)"),
     ]
 
     # MADRS items 1..10
@@ -141,8 +141,8 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
 def main():
     parser = argparse.ArgumentParser(description="Generate ablation study figure from analysis results.")
-    parser.add_argument("--results", type=str, nargs="?", default="../output/llamadrs_results.pkl.pkl",
-                        help="Path to the results pickle file (default: ../output/llamadrs_results.pkl.pkl)")
+    parser.add_argument("--results", type=str, nargs="?", default="../output/llamadrs_results.pkl",
+                        help="Path to the results pickle file (default: ../output/llamadrs_results.pkl)")
     parser.add_argument("-o", "--output", type=str, default="../output/fig2_prompt_ablation.png",
                         help="Output figure path (default: ../output/fig2_prompt_ablation.png)")
     parser.add_argument("--dpi", type=int, default=300, help="Figure DPI (default: 300)")

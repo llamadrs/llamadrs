@@ -42,12 +42,12 @@ MODEL_DICT = {
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
     "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: NR (3B-80B)",
 }
 # add ablations
 for ablation in ["raw", "no_desc", "no_dem"]:
     MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: NR, {ablation.replace('_', ' ').title()} (3B-80B)"
 
 
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
@@ -56,18 +56,20 @@ MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
 # ============================================================================
 # VISUAL DESIGN + CLINICAL THRESHOLDS
 # ============================================================================
-# ---- Thresholds (unchanged) ------------------------------------------------
-ITEM_MEANINGFUL_MAE   = 0.6   # "Acceptable" in your example legend
-ITEM_SUBSTANTIAL_MAE  = 1.2   # "Substantial" in your example legend
+ITEM_MEANINGFUL_MAE   = 0.6
+ITEM_SUBSTANTIAL_MAE  = 1.2
 
 
-def get_cell_color_item_mae(value: float, *, for_mean_row: bool = False) -> str:
-    """
-    Match the example output:
-      - < 0.6   -> green!15
-      - >= 1.2  -> red!15
-      - else    -> white!15 for normal model rows, and no fill for mean summary rows
-    """
+
+
+
+def get_cell_color_item_mae(
+    value: float,
+    *,
+    for_mean_row: bool = False,
+    best: bool = False,
+    worst: bool = False,
+) -> str:
     try:
         v = float(value)
     except (TypeError, ValueError):
@@ -75,12 +77,16 @@ def get_cell_color_item_mae(value: float, *, for_mean_row: bool = False) -> str:
     if not np.isfinite(v):
         return ""
 
-    if v < ITEM_MEANINGFUL_MAE:
-        return r"\cellcolor{green!15}"
-    if v >= ITEM_SUBSTANTIAL_MAE:
-        return r"\cellcolor{red!15}"
+    highlight = best or worst
 
-    return "" if for_mean_row else r"\cellcolor{white!15}"
+    if v < ITEM_MEANINGFUL_MAE:
+        return r"\cellcolor{DarkGreen}" if highlight else r"\cellcolor{LightGreen}"
+    if v >= ITEM_SUBSTANTIAL_MAE:
+        return r"\cellcolor{DarkRed}" if highlight else r"\cellcolor{LightRed}"
+
+    if for_mean_row:
+        return ""
+    return r"\cellcolor{DarkGray}" if highlight else r"\cellcolor{LightGray}"
 
 
 def create_comprehensive_itemwise_table(
@@ -90,7 +96,7 @@ def create_comprehensive_itemwise_table(
     models_csv: Optional[pd.DataFrame] = None,
 ) -> str:
     """
-    Item-wise MAE table formatted to match the provided example output.
+    Item-wise MAE table with reasoning / non-reasoning grouping.
     """
 
     def _abbrev_name(s: str) -> str:
@@ -107,11 +113,8 @@ def create_comprehensive_itemwise_table(
     item_indices = list(range(1, 11))
     rows = []
 
-    # Build rows from model ids in results
     for model in sorted(individual_results.keys()):
-        
         model_id = MODEL_REV_DICT.get(model, model)
-        # keep filtering logic based on model_id (internal id)
         if models_csv is None or model_id not in models_csv:
             continue
         if model_id in {
@@ -120,7 +123,7 @@ def create_comprehensive_itemwise_table(
             "segmented_Qw3_30b_a3b_ar_4q_NoR",
         }:
             continue
-            
+
         model_row = models_csv[model_id]
         display_name = model
 
@@ -131,7 +134,6 @@ def create_comprehensive_itemwise_table(
             entry[f"I{i}_mean"] = d.get("mae_mean", np.nan)
             entry[f"I{i}_std"]  = d.get("mae_std", np.nan)
 
-        # Overall (mean across items)
         d_overall = mean_results.get(model, {})
         entry["I11_mean"] = d_overall.get("mae_mean", np.nan)
         entry["I11_std"]  = d_overall.get("mae_std", np.nan)
@@ -141,7 +143,17 @@ def create_comprehensive_itemwise_table(
 
     df = pd.DataFrame(rows).sort_values(by="I11_mean").reset_index(drop=True)
 
-    # Best/worst markers per column computed BEFORE adding mean summary rows
+    # Global best/worst by overall mean
+    best_model_id = None
+    worst_model_id = None
+    if not df.empty:
+        mean_col = pd.to_numeric(df["I11_mean"], errors="coerce")
+        finite = mean_col[np.isfinite(mean_col)]
+        if not finite.empty:
+            best_model_id = df.loc[finite.idxmin(), "original_id"]
+            worst_model_id = df.loc[finite.idxmax(), "original_id"]
+
+    # Per-column min/max (computed once, not per row)
     col_stats = {}
     for i in item_indices + [11]:
         col = pd.to_numeric(df[f"I{i}_mean"], errors="coerce")
@@ -152,7 +164,7 @@ def create_comprehensive_itemwise_table(
     reasoning_df = df[df["is_reasoning"]].copy()
     non_reasoning_df = df[~df["is_reasoning"]].copy()
 
-    # Add group mean rows (placed at bottom of each group)
+    # Group mean summary rows
     def _append_group_mean(frame: pd.DataFrame, label: str) -> pd.DataFrame:
         if frame.empty:
             return frame
@@ -165,75 +177,108 @@ def create_comprehensive_itemwise_table(
     reasoning_df = _append_group_mean(reasoning_df, r"\textbf{Mean (Reasoning)}")
     non_reasoning_df = _append_group_mean(non_reasoning_df, r"\textbf{Mean (Non-Reasoning)}")
 
-    # Build LaTeX
+    # --- Build LaTeX --------------------------------------------------------
     latex = []
     latex.append(r"\begin{table*}[!tb]")
     latex.append(r"\centering")
-    latex.append(
-        r"\caption{Comprehensive Item-wise Performance: "
-        r"\textcolor{black}{\fcolorbox{white}{green!15}{\strut\enspace}}\ $<\,0.6$ \emph{(Acceptable)},"
-        r"\textcolor{black}{\fcolorbox{white}{red!15}{\strut\enspace}}\ $\geq\,1.2$ \emph{(Substantial)}.}"
-    )
-    latex.append(r"\label{tab:comprehensive_itemwise_reasoning}")
     latex.append(r"\renewcommand{\arraystretch}{1.05}")
     latex.append(r"\setlength{\tabcolsep}{2.5pt}")
     latex.append(r"{\footnotesize")
-    latex.append(r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lccccccccccc}")
+
+    meaningful_str = f"{ITEM_MEANINGFUL_MAE:g}"
+    substantial_str = f"{ITEM_SUBSTANTIAL_MAE:g}"
+    latex.append(
+        r"\caption{Item-wise MAE$\pm$ std. dev (I1--I10) and mean across items. "
+        r"For MoE models, size is $Active$--$Total$ parameters (e.g., 3B--30B = 3B active, 30B total). "
+        r"\textcolor{black}{\fcolorbox{white}{LightGreen}{\strut\enspace}}\ $<\,0.6$ \emph{(Acceptable)}, "
+        r"\textcolor{black}{\fcolorbox{white}{LightRed}{\strut\enspace}}\ $\geq\,1.2$ \emph{(Substantial)}.} "
+    )
+    latex.append(r"\label{tab:comprehensive_itemwise_reasoning}")
+    latex.append(r"\vspace{1mm}")
+    latex.append(r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l *{10}{c} c @{}}")
     latex.append(r"\toprule")
     latex.append(
-        r"\rowcolor{gray!15} \textbf{Model} & "
+        r"\rowcolor{gray!15} \textbf{Model} (\tiny{Size}) & "
         + " & ".join([f"\\textbf{{I{i}}}" for i in item_indices])
         + r" & \textbf{Mean} \\"
     )
     latex.append(r"\midrule")
+    def _format_item_cell(m, s, col_idx, *, is_summary: bool) -> str:
+        if not (isinstance(m, (int, float)) and np.isfinite(m)):
+            return r"\textemdash{}"
+        if not (isinstance(s, (int, float)) and np.isfinite(s)):
+            return r"\textemdash{}"
 
+        value_main = f"{m:.2f}"
+
+        # Best/worst markers only for real model rows (not group means)
+        stat = col_stats.get(col_idx)
+        best = worst = False
+        if (not is_summary) and stat:
+            mv = float(m)
+            if abs(mv - stat["min"]) <= 1e-6:
+                best = True
+            elif abs(mv - stat["max"]) <= 1e-6:
+                worst = True
+        
+        # Now compute color with correct best/worst
+        cell_color = get_cell_color_item_mae(m, for_mean_row=is_summary, best=best, worst=worst)
+
+        # Apply emphasis to main value only
+        if best:
+            value_main_fmt = rf"\textbf{{{value_main}}}"
+        elif worst:
+            value_main_fmt = rf"\textit{{{value_main}}}"
+        else:
+            value_main_fmt = value_main
+
+        # Color appears once; std line is uncolored (cell background already set)
+        value_str = rf"{cell_color}{value_main_fmt} \\ {cell_color}{{\tiny $\pm$ {s:.2f}}}"
+        return rf"\makecell{{{value_str}}}"
     def _emit_rows(frame: pd.DataFrame):
         for _, rr in frame.iterrows():
             model_text = str(rr["Model"])
-            is_summary = ("Mean (" in model_text)
+            is_summary = "Mean (" in model_text
 
-            # Model column forced white background (matches example)
-            cells = [r"\cellcolor{white} " + model_text]
+            is_best_model = (not is_summary) and best_model_id and (rr.get("original_id", "") == best_model_id)
+            is_worst_model = (not is_summary) and worst_model_id and (rr.get("original_id", "") == worst_model_id)
 
+            if is_summary:
+                # Thin rule before summary row
+                model_cell = rf"\midrule[\lightrulewidth] \rowcolor{{gray!15}} {model_text}"
+            elif is_best_model:
+                model_cell = rf"\cellcolor{{DarkGray}} \textbf{{{model_text}}}"
+            elif is_worst_model:
+                model_cell = rf"\cellcolor{{DarkGray}} \textit{{{model_text}}}"
+            else:
+                model_cell = model_text
+
+            cells = [model_cell]
             for i in item_indices + [11]:
-                m = rr.get(f"I{i}_mean", np.nan)
-                s = rr.get(f"I{i}_std", np.nan)
-
-                if not (isinstance(m, (int, float)) and np.isfinite(m)) or not (isinstance(s, (int, float)) and np.isfinite(s)):
-                    cells.append(r"\textemdash{}")
-                    continue
-
-                # Match example formatting
-                value_main = f"{m:.2f}"
-                value_str = f"{value_main} \\\\ {{\\tiny $\\pm$ {s:.2f}}}"
-
-                # Best/worst markers only for real model rows (not group means)
-                stat = col_stats.get(i)
-                if (not is_summary) and stat:
-                    if abs(float(m) - stat["min"]) <= 1e-6:
-                        value_str = f"\\textbf{{{value_main}}} \\\\ {{\\tiny $\\pm$ {s:.2f}}}"
-                    elif abs(float(m) - stat["max"]) <= 1e-6:
-                        value_str = f"\\textit{{{value_main}}} \\\\ {{\\tiny $\\pm$ {s:.2f}}}"
-
-                cell_color = get_cell_color_item_mae(m, for_mean_row=is_summary)
-
-                if cell_color:
-                    cells.append(f"\\makecell{{{cell_color}{value_str}}}")
-                else:
-                    cells.append(f"\\makecell{{{value_str}}}")
+                cells.append(_format_item_cell(
+                    rr.get(f"I{i}_mean", np.nan),
+                    rr.get(f"I{i}_std", np.nan),
+                    i,
+                    is_summary=is_summary,
+                ))
 
             latex.append(" & ".join(cells) + r" \\")
 
     # Reasoning section
-    latex.append(r"\multicolumn{12}{c}{\cellcolor{gray!10}\textbf{Reasoning Models}} \\")
-    latex.append(r"\midrule[0.5pt]")
+    latex.append(
+        rf"\multicolumn{{12}}{{c}}"
+        rf"{{\cellcolor{{ReasonBand}}\textsc{{Reasoning Models}}}} \\"
+    )
+    latex.append(r"\midrule[\lightrulewidth]")
     _emit_rows(reasoning_df)
 
     # Non-reasoning section
-    latex.append(r"")
-    latex.append(r"\midrule[1pt]")
-    latex.append(r"\multicolumn{12}{c}{\cellcolor{gray!10}\textbf{Non-Reasoning Models}} \\")
-    latex.append(r"\midrule[0.5pt]")
+    latex.append(r"\midrule")
+    latex.append(
+        rf"\multicolumn{{12}}{{c}}"
+        rf"{{\cellcolor{{NonRBand}}\textsc{{Non-Reasoning Models}}}} \\"
+    )
+    latex.append(r"\midrule[\lightrulewidth]")
     _emit_rows(non_reasoning_df)
 
     latex.append(r"\bottomrule")
@@ -245,7 +290,7 @@ def create_comprehensive_itemwise_table(
 
 
 # ============================================================================
-# 4. MASTER GENERATOR (fix missing all_tables init)
+# MASTER GENERATOR
 # ============================================================================
 def generate_all_academic_tables(
     individual_results: Dict,
@@ -259,7 +304,7 @@ def generate_all_academic_tables(
     """
     Generate comprehensive suite of academic tables with reasoning model highlighting.
     """
-    all_tables = []  # <-- FIX: initialize
+    all_tables = []
 
     print("  ✓ Item-wise performance with reasoning grouping")
     all_tables.append(create_comprehensive_itemwise_table(
@@ -272,9 +317,6 @@ def generate_all_academic_tables(
 
     full_latex = "\n\n".join(all_tables)
 
-    header = r"""% ============================================================================
-"""
-    full_latex = header + full_latex
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(full_latex)
@@ -324,7 +366,6 @@ if __name__ == "__main__":
     sum_results = data.get("sum_results", None)
     models_csv = data.get("models_csv", None)
 
-    # Generate tables
     _ = generate_all_academic_tables(
         individual_results,
         mean_results,

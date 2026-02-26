@@ -40,12 +40,12 @@ MODEL_DICT = {
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
     "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: NR (3B-80B)",
 }
 # add ablations
 for ablation in ["raw", "no_desc", "no_dem"]:
     MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: NR, {ablation.replace('_', ' ').title()} (3B-80B)"
 
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}

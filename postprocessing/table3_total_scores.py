@@ -41,12 +41,12 @@ MODEL_DICT = {
     "segmented_Qw3_235b_a22b_ar_4q": "Qwen 3 (22B-235B)",
     "segmented_L4_Maverick_17b_gptq_4q": "Llama 4 Maverick (17B-400B)",
     "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
-    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: No Reasoning (3B-80B)",
+    "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: NR (3B-80B)",
 }
 # add ablations
 for ablation in ["raw", "no_desc", "no_dem"]:
     MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: No Reasoning, {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: NR, {ablation.replace('_', ' ').title()} (3B-80B)"
 
 MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
@@ -54,18 +54,27 @@ MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
 # ============================================================================
 # VISUAL DESIGN + CLINICAL THRESHOLDS
 # ============================================================================
-# ---- Total-score thresholds (as you already have) --------------------------
 TOTAL_MAE_IS_NORMALIZED = False
 TOTAL_MEANINGFUL_MAE    = 0.6 if TOTAL_MAE_IS_NORMALIZED else 6.0
 TOTAL_SUBSTANTIAL_MAE   = 1.2 if TOTAL_MAE_IS_NORMALIZED else 12.0
 
+# F1 thresholds are computed from data quartiles (Q3 = good, Q1 = poor)
 
-def get_cell_color_total_mae(value: float, *, for_summary: bool = False) -> str:
+# ---- Color palette (HTML hex) ---------------------------------------------
+
+
+def get_cell_color_total_mae(
+    value: float,
+    *,
+    for_summary: bool = False,
+    best: bool = False,
+    worst: bool = False,
+) -> str:
     """
-    Match example for TOTAL MAE coloring:
-      - < 6   -> green!15
-      - >=12  -> red!15
-      - else  -> white!15 (and keep white!15 also for summary rows; example does that)
+    Total-score MAE coloring:
+      - < meaningful  -> LightGreen / DarkGreen (if best/worst)
+      - >= substantial -> LightRed / DarkRed
+      - else -> LightGray / DarkGray
     """
     try:
         v = float(value)
@@ -74,11 +83,45 @@ def get_cell_color_total_mae(value: float, *, for_summary: bool = False) -> str:
     if not np.isfinite(v):
         return ""
 
+    highlight = best or worst
+
     if v < TOTAL_MEANINGFUL_MAE:
-        return r"\cellcolor{green!15}"
+        return r"\cellcolor{DarkGreen}" if highlight else r"\cellcolor{LightGreen}"
     if v >= TOTAL_SUBSTANTIAL_MAE:
-        return r"\cellcolor{red!15}"
-    return r"\cellcolor{white!15}"
+        return r"\cellcolor{DarkRed}" if highlight else r"\cellcolor{LightRed}"
+
+    return r"\cellcolor{DarkGray}" if highlight else r"\cellcolor{LightGray}"
+
+
+def get_cell_color_f1(
+    value: float,
+    *,
+    q75: float,
+    q25: float,
+    best: bool = False,
+    worst: bool = False,
+) -> str:
+    """
+    F1 coloring (higher is better) based on data quartiles:
+      - >= Q3 (75th pct) -> LightGreen / DarkGreen
+      - <  Q1 (25th pct) -> LightRed / DarkRed
+      - else -> LightGray / DarkGray
+    """
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return ""
+    if not np.isfinite(v):
+        return ""
+
+    highlight = best or worst
+
+    if v >= q75:
+        return r"\cellcolor{DarkGreen}" if highlight else r"\cellcolor{LightGreen}"
+    if v < q25:
+        return r"\cellcolor{DarkRed}" if highlight else r"\cellcolor{LightRed}"
+
+    return r"\cellcolor{DarkGray}" if highlight else r"\cellcolor{LightGray}"
 
 
 def create_comprehensive_ranking_table(
@@ -90,17 +133,25 @@ def create_comprehensive_ranking_table(
     include_all: bool = False,
 ) -> str:
     """
-    Total-score + F1 table formatted to match your example output.
+    Total-score + F1 table with reasoning / non-reasoning grouping.
     """
-
+    def _abbrev_name(s: str) -> str:
+        """Abbreviate model display name for compact display (keeps (..B) part as tiny)."""
+        if custom_name_map and s in custom_name_map:
+            s = custom_name_map[s]
+        parts = s.split("(")
+        name = parts[0].strip()
+        size = "(" + parts[1].strip() if len(parts) > 1 else ""
+        if len(name) > 28:
+            name = name[:25] + "..."
+        return f"{name} {{\\tiny {size}}}" if size else name
     def _format_size(total_params, active_params) -> str:
-        """Format size like table2: main value + tiny parenthetical."""
         tp = "" if total_params is None else str(total_params).strip()
         ap = "" if active_params is None else str(active_params).strip()
         if not tp and not ap:
             return ""
         if tp and ap and tp != ap:
-            return f"{ap}-{tp}"
+            return f"{ap}--{tp}"
         return tp or ap
 
     # --- build rows ---------------------------------------------------------
@@ -118,34 +169,22 @@ def create_comprehensive_ranking_table(
 
         model_meta = models_csv[model_id]
 
-        # Display name: from MODEL_DICT or fallback to id
-        display = MODEL_DICT.get(model_id, model_id)
-        if custom_name_map and display in custom_name_map:
-            display = custom_name_map[display]
+        display = model
+        display = _abbrev_name(display)
 
-        # Match example: show base name only in first column (no (..B) part there)
-        model_base = display.split("(")[0].strip()
+        model_base = display
 
-        # Context length formatting like your code, but example uses k / m
         ctx = int(model_meta["context_length"])
         context_length = f"{int(ctx/1_000_000)}m" if ctx >= 1_000_000 else f"{int(ctx/1_000)}k"
 
-        # Size column: match table2 formatting (tiny parenthetical when total!=active)
-        total_params = model_meta.get("total_params", "")
-        active_params = model_meta.get("active_params", "")
-        size = _format_size(total_params, active_params)
-
-        # MOE column: example shows "No"/"MoE"/"Dense" depending on your metadata.
-        # Your metadata has "architecture" (e.g., "MOE" or "Dense"). We'll map to example style.
         arch = str(model_meta.get("architecture", "")).strip()
         if arch.upper() == "MOE":
             moe_cell = "MoE"
         elif arch:
             moe_cell = "Dense"
         else:
-            moe_cell = "No"
+            moe_cell = "---"
 
-        # Reasoning flag for grouping
         reasoning = str(model_meta.get("reasoning", "")).strip() == "Yes"
 
         # Direct total MAE (item 0 convention)
@@ -178,7 +217,6 @@ def create_comprehensive_ranking_table(
         rows.append({
             "model_id": model_id,
             "model_base": model_base,
-            "size": size,
             "moe": moe_cell,
             "context_length": context_length,
             "direct_mae": direct_mae,
@@ -195,7 +233,15 @@ def create_comprehensive_ranking_table(
     df = pd.DataFrame(rows)
     df = df.sort_values("direct_mae", na_position="last").reset_index(drop=True)
 
-    # Stats for bold/italic (best/worst) per metric column
+    best_model_id = None
+    worst_model_id = None
+    mae_series = pd.to_numeric(df["direct_mae"], errors="coerce")
+    finite = mae_series[np.isfinite(mae_series)]
+    if not finite.empty:
+        best_model_id = df.loc[finite.idxmin(), "model_id"]
+        worst_model_id = df.loc[finite.idxmax(), "model_id"]
+
+    # Per-column min/max for bold/italic
     def _finite_minmax(series: pd.Series):
         s = pd.to_numeric(series, errors="coerce")
         s = s[np.isfinite(s)]
@@ -210,6 +256,19 @@ def create_comprehensive_ranking_table(
         "sum_f1": _finite_minmax(df["sum_f1"]),
     }
 
+    # Compute F1 quartiles from actual data for color thresholds
+    def _finite_quartiles(series: pd.Series):
+        s = pd.to_numeric(series, errors="coerce")
+        s = s[np.isfinite(s)]
+        if s.empty:
+            return None
+        return {"q25": float(s.quantile(0.25)), "q75": float(s.quantile(0.75))}
+
+    f1_quartiles = {
+        "direct_f1": _finite_quartiles(df["direct_f1"]),
+        "sum_f1": _finite_quartiles(df["sum_f1"]),
+    }
+
     def format_cell(m, s, col_name, *, is_lower_better: bool, tie_tol: float = 1e-6) -> str:
         if not (isinstance(m, (int, float)) and np.isfinite(m)):
             return r"\textemdash{}"
@@ -217,29 +276,42 @@ def create_comprehensive_ranking_table(
         main = f"{m:.2f}"
         stat = col_stats.get(col_name)
 
-        # bold/italic best/worst like your example (they bold some, italic some)
+        is_best = False
+        is_worst = False
+
         if stat:
             if is_lower_better:
                 if abs(m - stat["min"]) <= tie_tol:
+                    is_best = True
                     main = rf"\textbf{{{main}}}"
                 elif abs(m - stat["max"]) <= tie_tol:
+                    is_worst = True
                     main = rf"\textit{{{main}}}"
             else:
                 if abs(m - stat["max"]) <= tie_tol:
+                    is_best = True
                     main = rf"\textbf{{{main}}}"
                 elif abs(m - stat["min"]) <= tie_tol:
+                    is_worst = True
                     main = rf"\textit{{{main}}}"
 
-        # color rules:
         if "mae" in col_name:
-            color = get_cell_color_total_mae(m)
+            color = get_cell_color_total_mae(m, best=is_best, worst=is_worst)
+        elif "f1" in col_name:
+            fq = f1_quartiles.get(col_name)
+            if fq:
+                color = get_cell_color_f1(m, q75=fq["q75"], q25=fq["q25"],
+                                          best=is_best, worst=is_worst)
+            else:
+                color = r"\cellcolor{DarkGray}" if (is_best or is_worst) else r"\cellcolor{LightGray}"
         else:
-            color = r"\cellcolor{white!15}"
+            color = r"\cellcolor{DarkGray}" if (is_best or is_worst) else r"\cellcolor{LightGray}"
 
-        # example uses: \makecell{\cellcolor{X}5.90 {\tiny $\pm$ 0.17}}
-        if not (isinstance(s, (int, float)) and np.isfinite(s)):
-            return rf"\makecell{{{color}{main}}}"
-        return rf"\makecell{{{color}{main} {{\tiny $\pm$ {s:.2f}}}}}"
+        std_part = ""
+        if isinstance(s, (int, float)) and np.isfinite(s):
+            std_part = rf" \scriptsize{{$\pm${s:.2f}}}"
+
+        return rf"{color} {main}{std_part}"
 
     # Split into groups
     reasoning_df = df[df["reasoning"]].reset_index(drop=True)
@@ -249,50 +321,66 @@ def create_comprehensive_ranking_table(
     latex = []
     latex.append(r"\begin{table*}[!tb]")
     latex.append(r"\centering")
+    latex.append(r"\renewcommand{\arraystretch}{1.15}")
+    latex.append(r"\setlength{\tabcolsep}{3pt}")
+    latex.append(r"\small")
+
+    # Caption — use combined F1 quartiles across DTS and ItS for legend
+    meaningful_str = f"{int(TOTAL_MEANINGFUL_MAE) if float(TOTAL_MEANINGFUL_MAE).is_integer() else TOTAL_MEANINGFUL_MAE:g}"
+    substantial_str = f"{int(TOTAL_SUBSTANTIAL_MAE) if float(TOTAL_SUBSTANTIAL_MAE).is_integer() else TOTAL_SUBSTANTIAL_MAE:g}"
+    all_f1 = pd.to_numeric(pd.concat([df["direct_f1"], df["sum_f1"]], ignore_index=True), errors="coerce")
+    all_f1 = all_f1[np.isfinite(all_f1)]
+    f1_q25_val = f"{float(all_f1.quantile(0.25)):.2f}" if not all_f1.empty else "Q1"
+    f1_q75_val = f"{float(all_f1.quantile(0.75)):.2f}" if not all_f1.empty else "Q3"
     latex.append(
-        r"\caption{Comprehensive Model Performance: "
-        r"\textcolor{black}{\fcolorbox{white}{green!15}{\strut\enspace}}\ $<\,"
-        + f"{int(TOTAL_MEANINGFUL_MAE) if float(TOTAL_MEANINGFUL_MAE).is_integer() else TOTAL_MEANINGFUL_MAE:g}"
-        + r"$ \emph{(Acceptable)}, "
-        r"\textcolor{black}{\fcolorbox{white}{red!15}{\strut\enspace}}\ $\geq\,"
-        + f"{int(TOTAL_SUBSTANTIAL_MAE) if float(TOTAL_SUBSTANTIAL_MAE).is_integer() else TOTAL_SUBSTANTIAL_MAE:g}"
-        + r"$ \emph{(Substantial)}.}"
+        r"\caption{Reasoning vs.\ non-reasoning models on MADRS total scoring. "
+        r"\textbf{DTS}: Direct Total Scoring (single LLM call). "
+        r"\textbf{ItS}: Item-then-Sum (10 item predictions summed post-hoc). "
+        r"For MoE models, size is Active--Total parameters. "
+        r"\textbf{Bold} = best; \textit{italic} = worst. \\"
+        r"\textcolor{black}{\fcolorbox{white}{LightGreen}{\strut\enspace}}~MAE~$<$\," + meaningful_str + r" (acceptable) / F1~$\geq$\," + f1_q75_val + r" (Q3), "
+        r"\textcolor{black}{\fcolorbox{white}{LightRed}{\strut\enspace}}~MAE~$\geq$\," + substantial_str + r" (substantial) / F1~$<$\," + f1_q25_val + r" (Q1).}"
     )
     latex.append(r"\label{tab:comprehensive_ranking}")
-    latex.append(r"\renewcommand{\arraystretch}{1.1}")
-    latex.append(r"\setlength{\tabcolsep}{2.5pt}")
-    latex.append(r"\small")
-    latex.append(r"\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X c c c | c | c | c |c}")
+    latex.append(r"\vspace{1mm}")
+
+    # Pure booktabs — no vertical rules
+    latex.append(r"\begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}X c c c c c c @{}}")
     latex.append(r"\toprule")
 
-    # two-row header (exact structure from your example)
+    # Clean two-row header — no vertical pipe
     latex.append(
-        r"% --- two-row header ---"
+        r"\rowcolor{gray!15} & & "
+        r"& \multicolumn{2}{c}{\textbf{MAE}~$\downarrow$}"
+        r"& \multicolumn{2}{c}{\textbf{F1}~$\uparrow$} \\"
     )
+    latex.append(r"\cmidrule(lr){4-5} \cmidrule(lr){6-7}")
     latex.append(
-        r"\cellcolor{white!7} & \cellcolor{white!7} & \cellcolor{white!7} & \cellcolor{white!7} &"
-        r"\multicolumn{2}{c}{\cellcolor{white!7}\textbf{MAE} $\downarrow$} &"
-        r"\multicolumn{2}{c}{\cellcolor{white!7}\textbf{F1} $\uparrow$ (Total $\geq$ 20)} \\"
+        r"\rowcolor{gray!15} \textbf{Model} (\tiny{Size}) & \textbf{Architecture} & \textbf{Ctx. Len.}"
+        r" & \textbf{DTS} & \textbf{ItS}"
+        r" & \textbf{DTS} & \textbf{ItS} \\"
     )
-    latex.append(
-        r"\multirow{-2}{*}{\cellcolor{white!7}\textbf{Model}} &"
-        r"\multirow{-2}{*}{\cellcolor{white!7}\textbf{Size}} &"
-        r"\multirow{-2}{*}{\cellcolor{white!7}\textbf{MOE}} &"
-        r"\multirow{-2}{*}{\cellcolor{white!7}\textbf{Context Length}} &"
-        r"\cellcolor{white!7}\textbf{Direct} & \cellcolor{white!7}\textbf{Sum} &"
-        r"\cellcolor{white!7}\textbf{Direct} & \cellcolor{white!7}\textbf{Sum} \\"
-    )
-    latex.append(r"\midrule")
-    latex.append(r"")
     latex.append(r"\midrule")
 
-    def _emit_group(title: str, frame: pd.DataFrame):
-        latex.append(rf"\multicolumn{{8}}{{c}}{{\cellcolor{{white!10}}\textbf{{{title}}}}} \\")
-        latex.append(r"\midrule[0.5pt]")
+    def _emit_group(title: str, frame: pd.DataFrame, band_color: str):
+        latex.append(
+            rf"\multicolumn{{7}}{{c}}"
+            rf"{{\cellcolor{{{band_color}}}\textsc{{{title}}}}} \\"
+        )
+        latex.append(r"\midrule[\lightrulewidth]")
         for _, row in frame.iterrows():
-            model_cell = r"\cellcolor{white} " + row["model_base"]
+            name = row["model_base"]
+            is_best_model = best_model_id is not None and row["model_id"] == best_model_id
+            is_worst_model = worst_model_id is not None and row["model_id"] == worst_model_id
+            model_bold_op = "\\textbf{" if (is_best_model  or is_worst_model) else ""
+            model_bold_cl = "}" if (is_best_model or is_worst_model) else ""
+            if is_best_model or is_worst_model:
+                model_color = "DarkGray"
+            else:
+                model_color = "white"
+    
             line = (
-                f"{model_cell} & {row['size']} & {row['moe']} & {row['context_length']} & "
+                rf"\cellcolor{{{model_color}}}{model_bold_op}{name}{model_bold_cl} & \cellcolor{{{model_color}}}{model_bold_op}{row['moe']}{model_bold_cl}  & \cellcolor{{{model_color}}}{model_bold_op}{row['context_length']}{model_bold_cl} & "
                 f"{format_cell(row['direct_mae'], row['direct_mae_std'], 'direct_mae', is_lower_better=True)} & "
                 f"{format_cell(row['sum_mae'], row['sum_mae_std'], 'sum_mae', is_lower_better=True)} & "
                 f"{format_cell(row['direct_f1'], row['direct_f1_std'], 'direct_f1', is_lower_better=False)} & "
@@ -300,13 +388,12 @@ def create_comprehensive_ranking_table(
             )
             latex.append(line)
 
-    _emit_group("Reasoning Models", reasoning_df)
-    latex.append(r"\midrule[1pt]")
-    _emit_group("Non-Reasoning Models", non_reasoning_df)
+    _emit_group("Reasoning Models", reasoning_df, "ReasonBand")
+    latex.append(r"\midrule")
+    _emit_group("Non-Reasoning Models", non_reasoning_df, "NonRBand")
 
     latex.append(r"\bottomrule")
     latex.append(r"\end{tabularx}")
-    latex.append(r"\vspace{2mm}")
     latex.append(r"\end{table*}")
 
     return "\n".join(latex)
@@ -331,7 +418,6 @@ def generate_all_academic_tables(
     print("🎨 GENERATING ACADEMIC TABLES WITH REASONING HIGHLIGHTS")
     print("=" * 70)
 
-
     print("  ✓ Comprehensive ranking with reasoning highlights")
     all_tables.append(create_comprehensive_ranking_table(
         individual_results, binary_results, sum_results, custom_name_map, models_csv
@@ -340,10 +426,6 @@ def generate_all_academic_tables(
 
     full_latex = "\n\n".join(all_tables)
 
-    header = r"""% ============================================================================
-"""
-    full_latex = header + full_latex
-
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(full_latex)
 
@@ -351,7 +433,6 @@ def generate_all_academic_tables(
     print("✅ TABLES WITH REASONING HIGHLIGHTS GENERATED")
     print("=" * 70)
     print(f"📄 Output file: {output_file}")
-    print(f"🧠 Reasoning models clearly distinguished with violet highlighting")
     print("=" * 70)
 
     return full_latex
