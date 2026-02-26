@@ -1219,6 +1219,10 @@ def main():
         "--skip-binary", action="store_true",
         help="Skip binary classification F1 calculation",
     )
+    parser.add_argument(
+        "--reprocess", action="store_true",
+        help="Force re-running the full analysis even if results pickle exists",
+    )
     args = parser.parse_args()
 
     # Set global paths
@@ -1263,47 +1267,112 @@ def main():
     print("=" * 80)
 
     processor = MADRSProcessor()
-    (
-        mean_results, individual_results, excel_cells,
-        excel_ground_truth, session_meta, valid, models_csv_dict,
-    ) = processor.run_analysis(excel_path=str(excel_path))
+
+    # If a previous results pickle exists and reprocess not requested, load it
+    results_bundle = None
+    mean_results = {}
+    individual_results = {}
+    excel_cells = {}
+    excel_ground_truth = {}
+    session_meta = {}
+    valid = {}
+    models_csv_dict = {}
+    sum_results = {}
+    binary_results = {}
+
+    if pkl_path.exists() and not args.reprocess:
+        print(f"Found existing results at {pkl_path}, loading and skipping full run_analysis.")
+        try:
+            with open(pkl_path, "rb") as f:
+                results_bundle = pickle.load(f)
+        except Exception as e:
+            print(f"Warning: failed to load existing pickle ({e}), will re-run analysis.")
+            results_bundle = None
+
+    if results_bundle is not None:
+        mean_results = results_bundle.get("mean_results", {})
+        individual_results = results_bundle.get("individual_results", {})
+        excel_cells = results_bundle.get("excel_cells", {})
+        excel_ground_truth = results_bundle.get("excel_ground_truth", {})
+        session_meta = results_bundle.get("session_meta", {})
+        valid = results_bundle.get("valid", {})
+        models_csv_dict = results_bundle.get("models_csv", {})
+        sum_results = results_bundle.get("sum_results", {}) or {}
+        binary_results = results_bundle.get("binary_results", {}) or {}
+    else:
+        # Run full analysis and get base results
+        (
+            mean_results, individual_results, excel_cells,
+            excel_ground_truth, session_meta, valid, models_csv_dict,
+        ) = processor.run_analysis(excel_path=str(excel_path))
+
+        # Save initial bundle (sum/binary left empty until computed)
+        results_bundle = {
+            "mean_results": mean_results,
+            "individual_results": individual_results,
+            "excel_cells": excel_cells,
+            "excel_ground_truth": excel_ground_truth,
+            "session_meta": session_meta,
+            "valid": valid,
+            "models_csv": models_csv_dict,
+            "sum_results": {},
+            "binary_results": {},
+        }
+        try:
+            with open(pkl_path, "wb") as f:
+                pickle.dump(results_bundle, f)
+            print(f"\nResults saved to {pkl_path}")
+        except Exception as e:
+            print(f"Warning: failed to write initial results pickle: {e}")
 
     # ---- Sum predictions ----
-    sum_results = {}
     if not args.skip_sum:
-        print("\n" + "=" * 80)
-        print("CALCULATING SUM PREDICTIONS (Items 1-10)")
-        print("=" * 80)
-        sum_results = calculate_sum_predictions(processor, valid, models_csv_dict)
-        print(f"Completed sum calculations for {len(sum_results)} models")
+        if sum_results:
+            print("Sum predictions already present in loaded results; skipping calculation.")
+        else:
+            print("\n" + "=" * 80)
+            print("CALCULATING SUM PREDICTIONS (Items 1-10)")
+            print("=" * 80)
+            sum_results = calculate_sum_predictions(processor, valid, models_csv_dict)
+            print(f"Completed sum calculations for {len(sum_results)} models")
+            # update and save
+            results_bundle["sum_results"] = sum_results
+            try:
+                with open(pkl_path, "wb") as f:
+                    pickle.dump(results_bundle, f)
+                print(f"Updated results saved to {pkl_path}")
+            except Exception as e:
+                print(f"Warning: failed to update pickle with sum_results: {e}")
+    else:
+        print("Skipping sum-of-items prediction calculation per CLI flag.")
 
     # ---- Binary classification ----
-    binary_results = {}
     if not args.skip_binary:
-        print("\n" + "=" * 80)
-        print("CALCULATING BINARY CLASSIFICATION F1 SCORES")
-        print("=" * 80)
-        binary_results = calculate_binary_classification_metrics(
-            processor, valid, models_csv_dict
-        )
-        print(f"Completed F1 calculations for {len(binary_results)} models")
+        if binary_results:
+            print("Binary classification results already present in loaded results; skipping calculation.")
+        else:
+            print("\n" + "=" * 80)
+            print("CALCULATING BINARY CLASSIFICATION F1 SCORES")
+            print("=" * 80)
+            binary_results = calculate_binary_classification_metrics(
+                processor, valid, models_csv_dict
+            )
+            print(f"Completed F1 calculations for {len(binary_results)} models")
+            # update and save
+            results_bundle["binary_results"] = binary_results
+            try:
+                with open(pkl_path, "wb") as f:
+                    pickle.dump(results_bundle, f)
+                print(f"Updated results saved to {pkl_path}")
+            except Exception as e:
+                print(f"Warning: failed to update pickle with binary_results: {e}")
+    else:
+        print("Skipping binary classification F1 calculation per CLI flag.")
 
-    # ---- Save pickle ----
-    results_bundle = {
-        "mean_results": mean_results,
-        "individual_results": individual_results,
-        "excel_cells": excel_cells,
-        "excel_ground_truth": excel_ground_truth,
-        "session_meta": session_meta,
-        "valid": valid,
-        "models_csv": models_csv_dict,
-        "sum_results": sum_results,
-        "binary_results": binary_results,
-    }
-
-    with open(pkl_path, "wb") as f:
-        pickle.dump(results_bundle, f)
-    print(f"\nResults saved to {pkl_path}")
+    # ---- Final bundle (ensure variables in scope) ----
+    # results_bundle should already be up to date; expose variables locally
+    sum_results = results_bundle.get("sum_results", {})
+    binary_results = results_bundle.get("binary_results", {})
 
     # ---- Summary ----
     if mean_results:

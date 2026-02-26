@@ -143,8 +143,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate ablation study figure from analysis results.")
     parser.add_argument("--results", type=str, nargs="?", default="../output/llamadrs_results.pkl.pkl",
                         help="Path to the results pickle file (default: ../output/llamadrs_results.pkl.pkl)")
-    parser.add_argument("-o", "--output", type=str, default="../output/figure2_ablation.png",
-                        help="Output figure path (default: ../output/figure2_ablation.png)")
+    parser.add_argument("-o", "--output", type=str, default="../output/fig2_prompt_ablation.png",
+                        help="Output figure path (default: ../output/fig2_prompt_ablation.png)")
     parser.add_argument("--dpi", type=int, default=300, help="Figure DPI (default: 300)")
     parser.add_argument("--no-show", action="store_true", help="Don't display the figure interactively")
     args = parser.parse_args()
