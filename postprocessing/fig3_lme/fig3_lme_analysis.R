@@ -120,11 +120,6 @@ MADRSErrorAnalysis <- R6Class(
                           "log_params_z", "log_context_length_z",
                           "architecture"))
 
-    # RE parts
-    re_parts <- c("(1 | model_name)",
-                  "(1 | patient)",
-                  "(1 | session:patient)",
-                  "(1 | madrs_item)")
     keep_nr  <- private$prune_fe_terms(df_nr,  fe_base_nr)
     print(fe_base_nr)
     cat("\n[NON-REASONING] FE terms:\n")
