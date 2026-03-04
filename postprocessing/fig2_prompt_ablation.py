@@ -29,12 +29,12 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     # ---- Box fill colors (blue & orange for high contrast)
     header_gray = _xcolor_mix_to_rgb("white!85")
-    r_hdr_col   = "#6558A6"
-    nr_hdr_col  = "#9A7540"
+    r_hdr_col   = "#b2abd3"
+    nr_hdr_col  = "#d3b2ab"
 
     # Strong accent colors for annotations
-    strong_blue   = mcolors.to_rgb("blue")
-    strong_orange = mcolors.to_rgb("orangered")
+    strong_reason   = "#6558A6"
+    strong_nr = "#9A7540"
 
     # ---- Configs (each will render two boxes: R and NR)
     configs = [
@@ -114,7 +114,7 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     for i, d in enumerate(med_deltas):
         if np.isfinite(d):
-            edge = strong_blue if d > 0 else strong_orange if d < 0 else (0.3, 0.3, 0.3)
+            edge = strong_reason if d > 0 else strong_nr if d < 0 else (0.3, 0.3, 0.3)
             sign = "+" if d > 0 else ""
             ax.text(
                 centers[i], ymax + 0.02, f"{sign}{d:.2f}",

@@ -2,6 +2,10 @@
 """
 Enhanced LlaMADRS Academic Tables Suite with Reasoning Model Highlighting
 Comprehensive LaTeX table generators with reasoning/non-reasoning visual distinction
+ACL/AI2 clean style: bold best, teal/rose/gray cell tints.
+Best/worst cells get darker shades of teal/rose.
+Rounded-corner (pill-style) backgrounds on metric cells via TikZ.
+Entire table wrapped in tcolorbox with rounded border.
 """
 
 import numpy as np
@@ -54,39 +58,34 @@ MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
 
 # ============================================================================
-# VISUAL DESIGN + CLINICAL THRESHOLDS
+# CLINICAL THRESHOLDS
 # ============================================================================
 ITEM_MEANINGFUL_MAE   = 0.6
 ITEM_SUBSTANTIAL_MAE  = 1.2
 
 
+# ============================================================================
+# CELL COLOR HELPER
+# ============================================================================
 
-
-
-def get_cell_color_item_mae(
+def _color_item_mae(
     value: float,
     *,
-    for_mean_row: bool = False,
-    best: bool = False,
-    worst: bool = False,
+    is_best: bool = False,
+    is_worst: bool = False,
 ) -> str:
+    """Return color name for item-level MAE cell tint."""
     try:
         v = float(value)
     except (TypeError, ValueError):
         return ""
     if not np.isfinite(v):
         return ""
-
-    highlight = best or worst
-
     if v < ITEM_MEANINGFUL_MAE:
-        return r"\cellcolor{DarkGreen}" if highlight else r"\cellcolor{LightGreen}"
+        return "tblGoodDk" if is_best else "tblGoodLt"
     if v >= ITEM_SUBSTANTIAL_MAE:
-        return r"\cellcolor{DarkRed}" if highlight else r"\cellcolor{LightRed}"
-
-    if for_mean_row:
-        return ""
-    return r"\cellcolor{DarkGray}" if highlight else r"\cellcolor{LightGray}"
+        return "tblBadDk" if is_worst else "tblBadLt"
+    return "tblNeutral"
 
 
 def create_comprehensive_itemwise_table(
@@ -97,6 +96,7 @@ def create_comprehensive_itemwise_table(
 ) -> str:
     """
     Item-wise MAE table with reasoning / non-reasoning grouping.
+    ACL/AI2 style with tcolorbox, rcell pills, teal/rose palette.
     """
 
     def _abbrev_name(s: str) -> str:
@@ -143,147 +143,115 @@ def create_comprehensive_itemwise_table(
 
     df = pd.DataFrame(rows).sort_values(by="I11_mean").reset_index(drop=True)
 
-    # Global best/worst by overall mean
-    best_model_id = None
-    worst_model_id = None
-    if not df.empty:
-        mean_col = pd.to_numeric(df["I11_mean"], errors="coerce")
-        finite = mean_col[np.isfinite(mean_col)]
-        if not finite.empty:
-            best_model_id = df.loc[finite.idxmin(), "original_id"]
-            worst_model_id = df.loc[finite.idxmax(), "original_id"]
-
-    # Per-column min/max (computed once, not per row)
-    col_stats = {}
+    # Per-column best/worst
+    col_bw = {}
     for i in item_indices + [11]:
         col = pd.to_numeric(df[f"I{i}_mean"], errors="coerce")
         good = col[np.isfinite(col)]
-        col_stats[i] = {"min": float(good.min()), "max": float(good.max())} if not good.empty else None
+        if not good.empty:
+            col_bw[i] = (float(good.min()), float(good.max()))
+        else:
+            col_bw[i] = (None, None)
 
     # Split by reasoning
     reasoning_df = df[df["is_reasoning"]].copy()
     non_reasoning_df = df[~df["is_reasoning"]].copy()
 
-    # Group mean summary rows
-    def _append_group_mean(frame: pd.DataFrame, label: str) -> pd.DataFrame:
-        if frame.empty:
-            return frame
-        mean_row = {"Model": label, "original_id": ""}
-        for i in item_indices + [11]:
-            mean_row[f"I{i}_mean"] = pd.to_numeric(frame[f"I{i}_mean"], errors="coerce").mean()
-            mean_row[f"I{i}_std"]  = pd.to_numeric(frame[f"I{i}_std"],  errors="coerce").mean()
-        return pd.concat([frame, pd.DataFrame([mean_row])], ignore_index=True)
-
-    reasoning_df = _append_group_mean(reasoning_df, r"\textbf{Mean (Reasoning)}")
-    non_reasoning_df = _append_group_mean(non_reasoning_df, r"\textbf{Mean (Non-Reasoning)}")
-
-    # --- Build LaTeX --------------------------------------------------------
-    latex = []
-    latex.append(r"\begin{table*}[!tb]")
-    latex.append(r"\centering")
-    latex.append(r"\renewcommand{\arraystretch}{1.05}")
-    latex.append(r"\setlength{\tabcolsep}{2.5pt}")
-    latex.append(r"{\footnotesize")
-
-    meaningful_str = f"{ITEM_MEANINGFUL_MAE:g}"
-    substantial_str = f"{ITEM_SUBSTANTIAL_MAE:g}"
-    latex.append(
-        r"\caption{Item-wise MAE$\pm$ std. dev (I1--I10) and mean across items. "
-        r"For MoE models, size is $Active$--$Total$ parameters (e.g., 3B--30B = 3B active, 30B total). "
-        r"\textcolor{black}{\fcolorbox{white}{LightGreen}{\strut\enspace}}\ $<\,0.6$ \emph{(Acceptable)}, "
-        r"\textcolor{black}{\fcolorbox{white}{LightRed}{\strut\enspace}}\ $\geq\,1.2$ \emph{(Substantial)}.} "
-    )
-    latex.append(r"\label{tab:comprehensive_itemwise_reasoning}")
-    latex.append(r"\vspace{1mm}")
-    latex.append(r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l *{10}{c} c @{}}")
-    latex.append(r"\toprule")
-    latex.append(
-        r"\rowcolor{gray!15} \textbf{Model} (\tiny{Size}) & "
-        + " & ".join([f"\\textbf{{I{i}}}" for i in item_indices])
-        + r" & \textbf{Mean} \\"
-    )
-    latex.append(r"\midrule")
+    # --- Format cell --------------------------------------------------------
     def _format_item_cell(m, s, col_idx, *, is_summary: bool) -> str:
         if not (isinstance(m, (int, float)) and np.isfinite(m)):
             return r"\textemdash{}"
         if not (isinstance(s, (int, float)) and np.isfinite(s)):
             return r"\textemdash{}"
 
-        value_main = f"{m:.2f}"
+        main = f"{m:.2f}"
 
-        # Best/worst markers only for real model rows (not group means)
-        stat = col_stats.get(col_idx)
-        best = worst = False
-        if (not is_summary) and stat:
-            mv = float(m)
-            if abs(mv - stat["min"]) <= 1e-6:
-                best = True
-            elif abs(mv - stat["max"]) <= 1e-6:
-                worst = True
-        
-        # Now compute color with correct best/worst
-        cell_color = get_cell_color_item_mae(m, for_mean_row=is_summary, best=best, worst=worst)
+        bw_best, bw_worst = col_bw.get(col_idx, (None, None))
+        is_best = (not is_summary) and bw_best is not None and abs(m - bw_best) <= 1e-6
+        is_worst = (not is_summary) and bw_worst is not None and abs(m - bw_worst) <= 1e-6
 
-        # Apply emphasis to main value only
-        if best:
-            value_main_fmt = rf"\textbf{{{value_main}}}"
-        elif worst:
-            value_main_fmt = rf"\textit{{{value_main}}}"
-        else:
-            value_main_fmt = value_main
+        if is_best:
+            main = rf"\textbf{{{main}}}"
 
-        # Color appears once; std line is uncolored (cell background already set)
-        value_str = rf"{cell_color}{value_main_fmt} \\ {cell_color}{{\tiny $\pm$ {s:.2f}}}"
-        return rf"\makecell{{{value_str}}}"
-    def _emit_rows(frame: pd.DataFrame):
+        color = _color_item_mae(m, is_best=is_best, is_worst=is_worst)
+
+        # Two-line cell: mean on top, ± std below
+        top_line = main
+        bot_line = rf"{{\tiny $\pm$ {s:.2f}}}"
+
+        if color:
+            return rf"\rcell{{{color}}}{{\makecell{{{top_line} \\ {bot_line}}}}}"
+        return rf"\makecell{{{top_line} \\ {bot_line}}}"
+
+    # --- Build LaTeX --------------------------------------------------------
+    latex = []
+    latex.append(r"\begin{table*}[!tb]")
+    latex.append(r"\centering")
+    latex.append(r"\footnotesize")
+    latex.append(
+        r"\caption{Item-wise MAE\,$\pm$\,std for I1--I10 with mean. "
+        r"Formatted as Table~\ref{tab:table2_total_scores}.}"
+    )
+    latex.append(r"\label{tab:table3_item_scores}")
+
+    # --- Rounded table frame ------------------------------------------------
+    latex.append(r"\begin{tcolorbox}[")
+    latex.append(r"  enhanced,")
+    latex.append(r"  boxrule=0.5pt,")
+    latex.append(r"  colframe=tblBorder,")
+    latex.append(r"  colback=white,")
+    latex.append(r"  arc=8pt,")
+    latex.append(r"  outer arc=8pt,")
+    latex.append(r"  left=3pt, right=3pt, top=3pt, bottom=3pt,")
+    latex.append(r"  boxsep=0pt,")
+    latex.append(r"  before upper={\arrayrulecolor{tblBorder}\renewcommand{\arraystretch}{1.35}\setlength{\tabcolsep}{2pt}},")
+    latex.append(r"]")
+
+    # 12 columns: Model + I1..I10 + Mean
+    latex.append(
+        r"\begin{tabularx}{\linewidth}{@{} "
+        r">{\hsize=0.30\hsize\raggedright\arraybackslash}X "
+        + r" ".join([r">{\hsize=0.07\hsize\centering\arraybackslash}X"] * 10)
+        + r" !{\color{tblBorder}\vrule width 0.5pt}"
+        + r" >{\hsize=0.07\hsize\centering\arraybackslash}X"
+        r" @{}}"
+    )
+    latex.append(r"\arrayrulecolor{tblBorder}")
+
+    # Header row
+    item_headers = " & ".join([rf"\textsf{{I{i}}}" for i in item_indices])
+    latex.append(
+        r"\rcell{tblNeutral}{\textsf{Model}\,{\scriptsize\textcolor{hdrSub}{(Size)}}}"
+        r" & " + " & ".join([rf"\rcell{{tblNeutral}}{{\textsf{{I{i}}}}}" for i in item_indices]) +
+        r" & \rcell{tblNeutral}{\textsf{Mean}} \\"
+    )
+    latex.append(r"\addlinespace[3pt]")
+
+    # --- Emit group ---------------------------------------------------------
+    def _emit_group(title: str, frame: pd.DataFrame):
+        latex.append(
+            r"\rowcolor{tblNeutral} \multicolumn{12}{@{}l@{}}"
+            rf"{{\small\textsc{{{title}}}}} \\"
+        )
+        latex.append(r"\addlinespace[3pt]")
         for _, rr in frame.iterrows():
             model_text = str(rr["Model"])
-            is_summary = "Mean (" in model_text
-
-            is_best_model = (not is_summary) and best_model_id and (rr.get("original_id", "") == best_model_id)
-            is_worst_model = (not is_summary) and worst_model_id and (rr.get("original_id", "") == worst_model_id)
-
-            if is_summary:
-                # Thin rule before summary row
-                model_cell = rf"\midrule[\lightrulewidth] \rowcolor{{gray!15}} {model_text}"
-            elif is_best_model:
-                model_cell = rf"\cellcolor{{DarkGray}} \textbf{{{model_text}}}"
-            elif is_worst_model:
-                model_cell = rf"\cellcolor{{DarkGray}} \textit{{{model_text}}}"
-            else:
-                model_cell = model_text
-
-            cells = [model_cell]
+            cells = [model_text]
             for i in item_indices + [11]:
                 cells.append(_format_item_cell(
                     rr.get(f"I{i}_mean", np.nan),
                     rr.get(f"I{i}_std", np.nan),
                     i,
-                    is_summary=is_summary,
+                    is_summary=False,
                 ))
-
             latex.append(" & ".join(cells) + r" \\")
+        latex.append(r"\addlinespace[3pt]")
 
-    # Reasoning section
-    latex.append(
-        rf"\multicolumn{{12}}{{c}}"
-        rf"{{\cellcolor{{ReasonBand}}\textsc{{Reasoning Models}}}} \\"
-    )
-    latex.append(r"\midrule[\lightrulewidth]")
-    _emit_rows(reasoning_df)
+    _emit_group("Reasoning Models", reasoning_df)
+    _emit_group("Non-Reasoning Models", non_reasoning_df)
 
-    # Non-reasoning section
-    latex.append(r"\midrule")
-    latex.append(
-        rf"\multicolumn{{12}}{{c}}"
-        rf"{{\cellcolor{{NonRBand}}\textsc{{Non-Reasoning Models}}}} \\"
-    )
-    latex.append(r"\midrule[\lightrulewidth]")
-    _emit_rows(non_reasoning_df)
-
-    latex.append(r"\bottomrule")
-    latex.append(r"\end{tabular*}")
-    latex.append(r"}")
+    latex.append(r"\end{tabularx}")
+    latex.append(r"\end{tcolorbox}")
     latex.append(r"\end{table*}")
 
     return "\n".join(latex)
@@ -306,6 +274,10 @@ def generate_all_academic_tables(
     """
     all_tables = []
 
+    print("=" * 70)
+    print("🎨 GENERATING ACADEMIC TABLES (ACL/AI2 STYLE)")
+    print("=" * 70)
+
     print("  ✓ Item-wise performance with reasoning grouping")
     all_tables.append(create_comprehensive_itemwise_table(
         individual_results,
@@ -316,7 +288,6 @@ def generate_all_academic_tables(
     all_tables.append("\n% " + "="*70 + "\n")
 
     full_latex = "\n\n".join(all_tables)
-
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(full_latex)
@@ -336,14 +307,14 @@ def generate_all_academic_tables(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Generate item-wise LaTeX tables from get_results.py outputs"
+        description="Generate Table 3 (item-wise) LaTeX from get_results.py outputs"
     )
     parser.add_argument(
         "--results", type=str, default="../output/llamadrs_results.pkl",
         help="Path to results pickle produced by get_results.py",
     )
     parser.add_argument(
-        "-o", "--output", type=str, default="../output/table2_item_scores.tex",
+        "-o", "--output", type=str, default="../output/table3_item_scores.tex",
         help="Output .tex file path",
     )
     args = parser.parse_args()
