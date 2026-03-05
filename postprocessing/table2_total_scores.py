@@ -386,12 +386,8 @@ def create_comprehensive_ranking_table(
 
     def _emit_group(title: str, frame: pd.DataFrame):
         latex.append(
-            r"\multicolumn{3}{@{}l@{}}"
-            rf"{{\rcell{{tblNeutral}}{{\small\textsc{{{title}}}}}}}"
-            r" & \rcell{tblNeutral}{\textsc{DTS}}"
-            r" & \rcell{tblNeutral}{\textsc{ItS}}"
-            r" & \rcell{tblNeutral}{\textsc{DTS}}"
-            r" & \rcell{tblNeutral}{\textsc{ItS}}\\"
+            r"\rowcolor{tblNeutral} \multicolumn{3}{@{}l@{}}"
+            rf"{{\small\textsc{{{title}}}}} & \textsc{{DTS}} &  \textsc{{ItS}} & \textsc{{DTS}} &  \textsc{{ItS}}\\"
         )
         latex.append(r"\addlinespace[1.5pt]")
         for _, row in frame.iterrows():

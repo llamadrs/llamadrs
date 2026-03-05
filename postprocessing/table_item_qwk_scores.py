@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Enhanced LlaMADRS Academic Tables Suite with Reasoning Model Highlighting
-Comprehensive LaTeX table generators with reasoning/non-reasoning visual distinction
-ACL/AI2 clean style: bold best, teal/rose/gray cell tints.
-Best/worst cells get darker shades of teal/rose.
-Rounded-corner (pill-style) backgrounds on metric cells via TikZ.
-Entire table wrapped in tcolorbox with rounded border.
+Generate Table 4: item-wise QWK (Cohen's quadratic weighted kappa) LaTeX.
+
+Layout/style mirrors table3_item_scores.py:
+- reasoning / non-reasoning grouping
+- rounded tcolorbox container
+- rounded rcell pills for values and headers
+- best/worst highlighting
 """
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-from typing import Dict, List, Tuple, Optional
-import re
+from typing import Dict, Optional
 import pickle
 import argparse
 from pathlib import Path
@@ -48,59 +47,49 @@ MODEL_DICT = {
     "segmented_Qw3_Next_80b_a3b_ar_4q": "Qwen 3 Next (3B-80B)",
     "segmented_Qw3_Next_80b_a3b_ar_4q_NoR": "Qwen 3 Next: NR (3B-80B)",
 }
-# add ablations
+
 for ablation in ["raw", "no_desc", "no_dem"]:
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
-    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = f"Qwen 3 Next: NR, {ablation.replace('_', ' ').title()} (3B-80B)"
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_{ablation}"] = (
+        f"Qwen 3 Next: {ablation.replace('_', ' ').title()} (3B-80B)"
+    )
+    MODEL_DICT[f"segmented_Qw3_Next_80b_a3b_ar_4q_NoR_{ablation}"] = (
+        f"Qwen 3 Next: NR, {ablation.replace('_', ' ').title()} (3B-80B)"
+    )
 
-
-MODEL_RANKS = {k: i for i, k in enumerate(MODEL_DICT.keys(), start=1)}
 MODEL_REV_DICT = {v: k for k, v in MODEL_DICT.items()}
 
-# ============================================================================
-# CLINICAL THRESHOLDS
-# ============================================================================
-ITEM_MEANINGFUL_MAE   = 0.6
-ITEM_SUBSTANTIAL_MAE  = 1.2
 
-
-# ============================================================================
-# CELL COLOR HELPER
-# ============================================================================
-
-def _color_item_mae(
+def _color_item_qwk(
     value: float,
     *,
+    q75: Optional[float],
+    q25: Optional[float],
     is_best: bool = False,
     is_worst: bool = False,
 ) -> str:
-    """Return color name for item-level MAE cell tint."""
+    """Return color name for item-level QWK tint (higher is better)."""
     try:
         v = float(value)
     except (TypeError, ValueError):
         return ""
     if not np.isfinite(v):
         return ""
-    if v < ITEM_MEANINGFUL_MAE:
+    if q75 is not None and v >= q75:
         return "tblGoodDk" if is_best else "tblGoodLt"
-    if v >= ITEM_SUBSTANTIAL_MAE:
+    if q25 is not None and v < q25:
         return "tblBadDk" if is_worst else "tblBadLt"
     return "tblNeutral"
 
 
-def create_comprehensive_itemwise_table(
+def create_comprehensive_itemwise_qwk_table(
     individual_results: Dict,
     mean_results: Dict,
     custom_name_map: Optional[Dict] = None,
     models_csv: Optional[pd.DataFrame] = None,
 ) -> str:
-    """
-    Item-wise MAE table with reasoning / non-reasoning grouping.
-    ACL/AI2 style with tcolorbox, rcell pills, teal/rose palette.
-    """
+    """Item-wise QWK table with reasoning / non-reasoning grouping."""
 
     def _abbrev_name(s: str) -> str:
-        """Abbreviate model display name for compact display (keeps (..B) part as tiny)."""
         if custom_name_map and s in custom_name_map:
             s = custom_name_map[s]
         parts = s.split("(")
@@ -125,76 +114,88 @@ def create_comprehensive_itemwise_table(
             continue
 
         model_row = models_csv[model_id]
-        display_name = model
-
-        entry = {"Model": _abbrev_name(display_name), "original_id": model_id}
+        entry = {"Model": _abbrev_name(model), "original_id": model_id}
 
         for i in item_indices:
             d = individual_results.get(model, {}).get(i, {})
-            entry[f"I{i}_mean"] = d.get("mae_mean", np.nan)
-            entry[f"I{i}_std"]  = d.get("mae_std", np.nan)
+            entry[f"I{i}_mean"] = d.get("qwk_mean", np.nan)
+            entry[f"I{i}_std"] = d.get("qwk_std", np.nan)
 
         d_overall = mean_results.get(model, {})
-        entry["I11_mean"] = d_overall.get("mae_mean", np.nan)
-        entry["I11_std"]  = d_overall.get("mae_std", np.nan)
+        entry["I11_mean"] = d_overall.get("qwk_mean", np.nan)
+        entry["I11_std"] = d_overall.get("qwk_std", np.nan)
+
+        if not (isinstance(entry["I11_mean"], (int, float)) and np.isfinite(entry["I11_mean"])):
+            vals = [entry.get(f"I{i}_mean", np.nan) for i in item_indices]
+            entry["I11_mean"] = float(np.nanmean(vals)) if np.isfinite(np.nanmean(vals)) else np.nan
+        if not (isinstance(entry["I11_std"], (int, float)) and np.isfinite(entry["I11_std"])):
+            vals = [entry.get(f"I{i}_std", np.nan) for i in item_indices]
+            entry["I11_std"] = float(np.nanmean(vals)) if np.isfinite(np.nanmean(vals)) else np.nan
 
         entry["is_reasoning"] = str(model_row.get("reasoning", "")).strip() == "Yes"
         rows.append(entry)
 
-    df = pd.DataFrame(rows).sort_values(by="I11_mean").reset_index(drop=True)
+    if not rows:
+        return ""
 
-    # Per-column best/worst
+    df = pd.DataFrame(rows).sort_values(by="I11_mean", ascending=False).reset_index(drop=True)
+
     col_bw = {}
+    col_q = {}
     for i in item_indices + [11]:
         col = pd.to_numeric(df[f"I{i}_mean"], errors="coerce")
         good = col[np.isfinite(col)]
         if not good.empty:
-            col_bw[i] = (float(good.min()), float(good.max()))
+            col_bw[i] = (float(good.max()), float(good.min()))  # best=max, worst=min
+            col_q[i] = (float(good.quantile(0.75)), float(good.quantile(0.25)))
         else:
             col_bw[i] = (None, None)
+            col_q[i] = (None, None)
 
-    # Split by reasoning
     reasoning_df = df[df["is_reasoning"]].copy()
     non_reasoning_df = df[~df["is_reasoning"]].copy()
 
-    # --- Format cell --------------------------------------------------------
-    def _format_item_cell(m, s, col_idx, *, is_summary: bool) -> str:
+    def _format_item_cell(m, s, col_idx) -> str:
         if not (isinstance(m, (int, float)) and np.isfinite(m)):
             return r"\textemdash{}"
         if not (isinstance(s, (int, float)) and np.isfinite(s)):
             return r"\textemdash{}"
 
         main = f"{m:.2f}"
-
         bw_best, bw_worst = col_bw.get(col_idx, (None, None))
-        is_best = (not is_summary) and bw_best is not None and abs(m - bw_best) <= 1e-6
-        is_worst = (not is_summary) and bw_worst is not None and abs(m - bw_worst) <= 1e-6
+        q75, q25 = col_q.get(col_idx, (None, None))
+
+        is_best = bw_best is not None and abs(m - bw_best) <= 1e-6
+        is_worst = bw_worst is not None and abs(m - bw_worst) <= 1e-6
 
         if is_best:
             main = rf"\textbf{{{main}}}"
 
-        color = _color_item_mae(m, is_best=is_best, is_worst=is_worst)
+        color = _color_item_qwk(
+            m,
+            q75=q75,
+            q25=q25,
+            is_best=is_best,
+            is_worst=is_worst,
+        )
 
-        # Two-line cell: mean on top, ± std below
         top_line = main
         bot_line = rf"{{\tiny $\pm$ {s:.2f}}}"
-
         if color:
             return rf"\rcell{{{color}}}{{\makecell{{{top_line} \\ {bot_line}}}}}"
         return rf"\makecell{{{top_line} \\ {bot_line}}}"
 
-    # --- Build LaTeX --------------------------------------------------------
     latex = []
     latex.append(r"\begin{table*}[!tb]")
     latex.append(r"\centering")
-    latex.append(r"\scriptsize")
+    latex.append(r"\footnotesize")
     latex.append(
-        r"\caption{Item-wise MAE\,$\pm$\,std for I1--I10 with mean. "
-        r"Formatted as Table~\ref{tab:table2_total_scores}.}"
+        r"\caption{Item-wise QWK\,$\pm$\,std for I1--I10 with mean "
+        r"(Cohen's quadratic weighted kappa; higher is better). "
+        r"Bold denotes best value per column; darker shades indicate best/worst cells.}"
     )
-    latex.append(r"\label{tab:table3_item_scores}")
+    latex.append(r"\label{tab:table_item_qwk_scores}")
 
-    # --- Rounded table frame ------------------------------------------------
     latex.append(r"\begin{tcolorbox}[")
     latex.append(r"  enhanced,")
     latex.append(r"  boxrule=0.5pt,")
@@ -207,7 +208,6 @@ def create_comprehensive_itemwise_table(
     latex.append(r"  before upper={\arrayrulecolor{tblBorder}\renewcommand{\arraystretch}{1.25}\setlength{\tabcolsep}{2pt}},")
     latex.append(r"]")
 
-    # 12 columns: Model + I1..I10 + Mean
     latex.append(
         r"\begin{tabularx}{\linewidth}{@{} "
         r">{\hsize=0.30\hsize\raggedright\arraybackslash}X "
@@ -218,34 +218,29 @@ def create_comprehensive_itemwise_table(
     )
     latex.append(r"\arrayrulecolor{tblBorder}")
 
-    # Header row
-    item_headers = " & ".join([rf"\textsf{{I{i}}}" for i in item_indices])
     latex.append(
         r"\rcell{tblNeutral}{\textsf{Model}\,{\scriptsize\textcolor{hdrSub}{(Size)}}}"
         r" & " + " & ".join([rf"\rcell{{tblNeutral}}{{\textsf{{I{i}}}}}" for i in item_indices]) +
         r" & \rcell{tblNeutral}{\textsf{Mean}} \\"
     )
-    latex.append(r"\addlinespace[2pt]")
+    latex.append(r"\addlinespace[3pt]")
 
-    # --- Emit group ---------------------------------------------------------
     def _emit_group(title: str, frame: pd.DataFrame):
         latex.append(
-            r"\rowcolor{tblNeutral} \multicolumn{12}{@{}l@{}}"
-            rf"{{\small\textsc{{{title}}}}} \\"
+            r"\multicolumn{12}{@{}l@{}}"
+            rf"{{\rcell{{tblNeutral}}{{\small\textsc{{{title}}}}}}} \\"
         )
-        latex.append(r"\addlinespace[2pt]")
+        latex.append(r"\addlinespace[3pt]")
         for _, rr in frame.iterrows():
-            model_text = str(rr["Model"])
-            cells = [model_text]
+            cells = [str(rr["Model"])]
             for i in item_indices + [11]:
                 cells.append(_format_item_cell(
                     rr.get(f"I{i}_mean", np.nan),
                     rr.get(f"I{i}_std", np.nan),
                     i,
-                    is_summary=False,
                 ))
             latex.append(" & ".join(cells) + r" \\")
-        latex.append(r"\addlinespace[2pt]")
+        latex.append(r"\addlinespace[3pt]")
 
     _emit_group("Reasoning Models", reasoning_df)
     _emit_group("Non-Reasoning Models", non_reasoning_df)
@@ -257,35 +252,29 @@ def create_comprehensive_itemwise_table(
     return "\n".join(latex)
 
 
-# ============================================================================
-# MASTER GENERATOR
-# ============================================================================
 def generate_all_academic_tables(
     individual_results: Dict,
     mean_results: Dict,
-    binary_results: Optional[Dict] = None,
-    sum_results: Optional[Dict] = None,
     models_csv: Optional[pd.DataFrame] = None,
-    output_file: str = "academic_tables_reasoning.tex",
-    custom_name_map: Optional[Dict] = None
+    output_file: str = "table4_item_qwk_scores.tex",
+    custom_name_map: Optional[Dict] = None,
 ) -> str:
-    """
-    Generate comprehensive suite of academic tables with reasoning model highlighting.
-    """
     all_tables = []
 
     print("=" * 70)
-    print("🎨 GENERATING ACADEMIC TABLES (ACL/AI2 STYLE)")
+    print("🎨 GENERATING QWK TABLE (ACL/AI2 STYLE)")
     print("=" * 70)
 
-    print("  ✓ Item-wise performance with reasoning grouping")
-    all_tables.append(create_comprehensive_itemwise_table(
-        individual_results,
-        mean_results=mean_results,
-        custom_name_map=custom_name_map,
-        models_csv=models_csv
-    ))
-    all_tables.append("\n% " + "="*70 + "\n")
+    print("  ✓ Item-wise QWK with reasoning grouping")
+    all_tables.append(
+        create_comprehensive_itemwise_qwk_table(
+            individual_results,
+            mean_results=mean_results,
+            custom_name_map=custom_name_map,
+            models_csv=models_csv,
+        )
+    )
+    all_tables.append("\n% " + "=" * 70 + "\n")
 
     full_latex = "\n\n".join(all_tables)
 
@@ -293,7 +282,7 @@ def generate_all_academic_tables(
         f.write(full_latex)
 
     print("\n" + "=" * 70)
-    print("✅ TABLES GENERATED")
+    print("✅ TABLE GENERATED")
     print("=" * 70)
     print(f"📄 Output file: {output_file}")
     print("=" * 70)
@@ -301,20 +290,16 @@ def generate_all_academic_tables(
     return full_latex
 
 
-# ============================================================================
-# Example usage
-# ============================================================================
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Generate Table 3 (item-wise) LaTeX from get_results.py outputs"
+        description="Generate Table 4 (item-wise QWK) LaTeX from get_results.py outputs"
     )
     parser.add_argument(
         "--results", type=str, default="../output/llamadrs_results.pkl",
         help="Path to results pickle produced by get_results.py",
     )
     parser.add_argument(
-        "-o", "--output", type=str, default="../output/table3_item_scores.tex",
+        "-o", "--output", type=str, default="../output/table4_item_qwk_scores.tex",
         help="Output .tex file path",
     )
     args = parser.parse_args()
@@ -333,16 +318,12 @@ if __name__ == "__main__":
 
     individual_results = data.get("individual_results", {})
     mean_results = data.get("mean_results", {})
-    binary_results = data.get("binary_results", None)
-    sum_results = data.get("sum_results", None)
     models_csv = data.get("models_csv", None)
 
     _ = generate_all_academic_tables(
         individual_results,
         mean_results,
-        binary_results,
-        sum_results,
-        models_csv,
+        models_csv=models_csv,
         output_file=str(out_path),
     )
 
