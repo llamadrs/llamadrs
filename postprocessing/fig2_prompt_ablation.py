@@ -1,4 +1,6 @@
 import argparse
+import csv
+import os
 import pickle
 
 import numpy as np
@@ -116,7 +118,7 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
     draw_boxes(dist_R,  pos_R,  r_fill,  r_edge,  r_scatter,
                "Reasoning",    hatch='///',  marker='o')
     draw_boxes(dist_NR, pos_NR, nr_fill, nr_edge, nr_scatter,
-               "No-Reasoning", hatch='...',  marker='D')
+               "Non-Reasoning", hatch='...',  marker='D')
 
     # ---- Clinical‑threshold reference lines (distinct dash patterns for B/W)
     ax.axhline(ITEM_MEANINGFUL_MAE, color=HDR_ICON, linewidth=1.4,
@@ -148,7 +150,7 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
         if np.isfinite(d):
             if d > 0:       # NR worse → Reasoning wins
                 ec, fc, tc = r_edge, r_edge, 'white'
-            elif d < 0:     # NR better → No-Reasoning wins
+            elif d < 0:     # NR better → Non-Reasoning wins
                 ec, fc, tc = nr_edge, nr_edge, 'white'
             else:
                 ec, fc, tc = HDR_SUB, HDR_SUB, 'white'
@@ -177,7 +179,7 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
         Patch(facecolor=r_fill, edgecolor=r_edge, linewidth=1.4,
               hatch='///', label="Reasoning"),
         Patch(facecolor=nr_fill, edgecolor=nr_edge, linewidth=1.4,
-              hatch='...', label="No-Reasoning"),
+              hatch='...', label="Non-Reasoning"),
     ]
     leg = ax.legend(
         handles=legend_entries, framealpha=0.97, loc='lower right',
@@ -196,7 +198,17 @@ def plot_ablation_readable(ablation_individual_results, ablation_mean_results, f
 
     ax.set_ylim(0.3, ymax + 0.25)
     plt.tight_layout()
-    return fig
+
+    # ---- Collect tabular data for CSV export
+    config_labels = [c[0] for c in configs]
+    csv_data = {
+        "configs": config_labels,
+        "item_indices": item_indices,
+        "dist_R": dist_R,
+        "dist_NR": dist_NR,
+        "med_deltas": med_deltas,
+    }
+    return fig, csv_data
 
 
 def main():
@@ -215,9 +227,49 @@ def main():
     mean_results = data["mean_results"]
     individual_results = data["individual_results"]
 
-    fig = plot_ablation_readable(individual_results, mean_results)
+    fig, csv_data = plot_ablation_readable(individual_results, mean_results)
     fig.savefig(args.output, dpi=args.dpi)
     print(f"Saved figure to {args.output}")
+
+    # ---- Write CSV with the plotted values
+    csv_path = os.path.splitext(args.output)[0] + ".csv"
+    configs_list  = csv_data["configs"]
+    item_indices  = csv_data["item_indices"]
+    dist_R        = csv_data["dist_R"]
+    dist_NR       = csv_data["dist_NR"]
+    med_deltas    = csv_data["med_deltas"]
+
+    with open(csv_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+
+        # — Per-item MAE table
+        header = ["Config", "Mode"] + [f"Item {i}" for i in item_indices] + [
+            "Median", "Mean", "Std", "Min", "Max",
+        ]
+        writer.writerow(header)
+
+        for cfg, r_arr, nr_arr, delta in zip(
+            configs_list, dist_R, dist_NR, med_deltas
+        ):
+            for mode, arr in [("Reasoning", r_arr), ("Non-Reasoning", nr_arr)]:
+                item_vals = [f"{v:.4f}" if idx < len(arr) else "" for idx, v in enumerate(arr)]
+                # Pad if fewer items than expected
+                item_vals += [""] * (len(item_indices) - len(item_vals))
+                stats = (
+                    [f"{np.median(arr):.4f}", f"{np.mean(arr):.4f}",
+                     f"{np.std(arr):.4f}", f"{np.min(arr):.4f}", f"{np.max(arr):.4f}"]
+                    if len(arr) > 0 else [""] * 5
+                )
+                writer.writerow([cfg, mode] + item_vals + stats)
+
+        # — Blank separator + delta summary
+        writer.writerow([])
+        writer.writerow(["Config", "Median Delta (NR - R)"])
+        for cfg, delta in zip(configs_list, med_deltas):
+            writer.writerow([cfg, f"{delta:.4f}" if np.isfinite(delta) else ""])
+
+    print(f"Saved CSV  to {csv_path}")
+
     if not args.no_show:
         plt.show()
 

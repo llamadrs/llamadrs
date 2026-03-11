@@ -223,48 +223,6 @@ plot_task_blups = function(output_base = "../output/blups", csv_base = "../outpu
     dir.create(dirname(csv_path), recursive = TRUE, showWarnings = FALSE)
     utils::write.csv(df, csv_path, row.names = FALSE)
     message(sprintf("Wrote item BLUPs to '%s'", csv_path))
-
-    # --- Plot 1: BLUP totals (CIs may be NA) ---
-    p1 <- ggplot2::ggplot(df, ggplot2::aes(x = estimate, y = label)) +
-      ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.4, alpha = 0.6) +
-      { if (all(!is.na(df$ci_low))) ggplot2::geom_errorbar(
-          ggplot2::aes(xmin = ci_low, xmax = ci_high), height = 0, alpha = 0.7
-        ) else ggplot2::geom_blank() } +
-      ggplot2::geom_point(size = 2.3, ggplot2::aes(color = estimate > 0)) +
-      ggplot2::scale_color_manual(values = c(`TRUE` = "#d62728", `FALSE` = "#1f77b4"), guide = "none") +
-      ggplot2::labs(
-        x = "BLUP (group-level total)",
-        y = NULL,
-        title = sprintf("Item-level BLUPs — %s", fit_name),
-        subtitle = "Totals (lme4 totals typically have no CI)"
-      ) +
-      ggplot2::theme_minimal(base_size = 11)
-
-    out_tot <- sprintf("%s_%s.png", sub("\\.png$", "", output_base, ignore.case = TRUE), fit_name)
-    dir.create(dirname(out_tot), recursive = TRUE, showWarnings = FALSE)
-    ggplot2::ggsave(filename = out_tot, plot = p1, width = 7.0, height = 4.8, dpi = 300)
-    message(sprintf("Saved BLUP totals plot to '%s'", out_tot))
-
-    # --- Plot 2: random-effect deviations (has CI) ---
-    p2 <- ggplot2::ggplot(df, ggplot2::aes(x = dev, y = label)) +
-      ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.4, alpha = 0.6) +
-      { if (all(!is.na(df$dev_low))) ggplot2::geom_errorbar(
-          ggplot2::aes(xmin = dev_low, xmax = dev_high), height = 0, alpha = 0.7
-        ) else ggplot2::geom_blank() } +
-      ggplot2::geom_point(size = 2.3, ggplot2::aes(color = dev > 0)) +
-      ggplot2::scale_color_manual(values = c(`TRUE` = "#d62728", `FALSE` = "#1f77b4"), guide = "none") +
-      ggplot2::labs(
-        x = "Random-effect deviation",
-        y = NULL,
-        title = sprintf("Item Random-Effect Deviations — %s", fit_name),
-        subtitle = "Modelbased (random) with 95% CI"
-      ) +
-      ggplot2::theme_minimal(base_size = 11)
-
-    out_dev <- sprintf("%s_%s_random_deviation.png",
-                       sub("\\.png$", "", output_base, ignore.case = TRUE), fit_name)
-    ggplot2::ggsave(filename = out_dev, plot = p2, width = 7.0, height = 4.8, dpi = 300)
-    message(sprintf("Saved BLUP random-deviation plot to '%s'", out_dev))
   }
 
   invisible(TRUE)
@@ -586,7 +544,7 @@ build_formula = function(response, fe_terms, re_terms) {
 # ==============================================================================
  if (interactive() || !exists("sourced")) {
 
-  output_dir <- "../output"
+  output_dir <- "../../output"
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   analyzer_path <- file.path(output_dir, "analyzer.rds")
@@ -645,7 +603,7 @@ build_formula = function(response, fe_terms, re_terms) {
   cat("Generating report (both fits + variance + paired test)...\n")
   analyzer$generate_report_items(file.path(output_dir, "error_analysis_items.txt"))
 
-  cat("Plotting task BLUPs (per fit)...\n")
+  cat("Generating task BLUPs (per fit)...\n")
 
   analyzer$plot_task_blups(output_base = file.path(output_dir, "blups"),
                            csv_base    = file.path(output_dir, "blups"))
